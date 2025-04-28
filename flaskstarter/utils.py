@@ -9,8 +9,13 @@ import datetime
 
 
 # Instance folder path, to keep stuff aware from flask app.
-INSTANCE_FOLDER_PATH = os.path.join('/tmp', 'flaskstarter-instance')
-
+# INSTANCE_FOLDER_PATH = os.path.join('/tmp', 'flaskstarter-instance')
+# INSTANCE_FOLDER_PATH = "E:/Users/lenovo/Desktop/flask-starter-main/instance"
+basedir = os.path.abspath(os.path.dirname(__file__))
+# 在项目根目录下创建一个 'tmp' 文件夹
+tmp_folder = os.path.join(basedir, "tmp")
+# 将实例文件夹路径设置为项目根目录下的 'tmp/flaskstarter-instance'
+INSTANCE_FOLDER_PATH = os.path.join(tmp_folder, "flaskstarter-instance")
 
 # Form validation
 

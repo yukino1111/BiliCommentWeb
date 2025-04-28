@@ -7,13 +7,15 @@ from flaskstarter.extensions import db
 from flaskstarter.user import Users, ADMIN, USER, ACTIVE
 from flaskstarter.tasks import MyTaskModel
 
+from flaskstarter.utils import INSTANCE_FOLDER_PATH
+
 application = create_app()
 
 
 @application.cli.command("initdb")
 def initdb():
     """Init/reset database."""
-
+    print(f"INSTANCE_FOLDER_PATH: " + INSTANCE_FOLDER_PATH)
     db.drop_all()
     configure_mappers()
     db.create_all()
