@@ -1,0 +1,32 @@
+{% from "macros/_form.html" import render_form %} {% set page_title =
+'B站评论爬虫' %} {% extends 'layouts/base.html' %} {% block body %}
+<div class="container">
+  <div class="row mt-5">
+    <div class="col-lg-6 offset-3">
+      <h2 class="mb-4">B站视频评论爬虫</h2>
+      <div class="card">
+        <div class="card-body">
+          <p class="card-text">
+            输入B站视频BV号，下载该视频下的评论数据（CSV格式）
+          </p>
+          <p class="card-text text-muted">
+            BV号形如：BV1awjwzmEao，可从视频链接中获取
+          </p>
+          {{ render_form(url_for('bilibili.crawler'), form) }}
+        </div>
+      </div>
+
+      <div class="alert alert-info mt-4">
+        <h5>使用说明:</h5>
+        <ul>
+          <li>输入视频的BV号（以BV开头的12位字符）</li>
+          <li>选择是否爬取二级评论（回复）</li>
+          <li>点击"开始爬取"按钮开始下载</li>
+          <li>爬取过程可能需要几秒钟至几分钟，请耐心等待</li>
+          <li>下载完成后将自动保存CSV文件到您的设备</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

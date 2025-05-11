@@ -7,18 +7,15 @@ from .user import Users, UsersAdmin
 from .settings import settings
 from .tasks import tasks, MyTaskModelAdmin
 from .frontend import frontend, ContactUsAdmin
+from .bilibili import bilibili  # 添加这一行
 from .extensions import db, mail, cache, login_manager, admin
 from .utils import INSTANCE_FOLDER_PATH, pretty_date
 
 
 # For import *
-__all__ = ['create_app']
+__all__ = ["create_app"]
 
-DEFAULT_BLUEPRINTS = (
-    frontend,
-    settings,
-    tasks
-)
+DEFAULT_BLUEPRINTS = (frontend, settings, tasks, bilibili)  # 添加这一行
 
 
 def create_app(config=None, app_name=None, blueprints=None):
@@ -29,9 +26,9 @@ def create_app(config=None, app_name=None, blueprints=None):
     if blueprints is None:
         blueprints = DEFAULT_BLUEPRINTS
 
-    app = Flask(app_name,
-                instance_path=INSTANCE_FOLDER_PATH,
-                instance_relative_config=True)
+    app = Flask(
+        app_name, instance_path=INSTANCE_FOLDER_PATH, instance_relative_config=True
+    )
 
     configure_app(app, config)
     configure_hook(app)
@@ -49,7 +46,7 @@ def configure_app(app, config=None):
 
     app.config.from_object(DefaultConfig)
 
-    app.config.from_pyfile('production.cfg', silent=True)
+    app.config.from_pyfile("production.cfg", silent=True)
 
     if config:
         app.config.from_object(config)
@@ -75,6 +72,7 @@ def configure_extensions(app):
     @login_manager.user_loader
     def load_user(id):
         return Users.query.get(id)
+
     login_manager.setup_app(app)
 
 
@@ -92,7 +90,7 @@ def configure_template_filters(app):
         return pretty_date(value)
 
     @app.template_filter()
-    def format_date(value, format='%Y-%m-%d'):
+    def format_date(value, format="%Y-%m-%d"):
         return value.strftime(format)
 
 
