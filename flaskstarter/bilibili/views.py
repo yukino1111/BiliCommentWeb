@@ -11,13 +11,14 @@ from flask import (
 )
 from flask_login import login_required
 import io
-
+import os
 from .forms import BVCrawlerForm, UIDCrawlerForm, ModeSelectForm
 
 # from .crawler import BilibiliCrawler
 from .get_single_video_comment import BilibiliCommentCrawler
 from .get_all_bv import GetInfo
 from .comment_merger import CommentMerger
+from .analyze import CommentAnalyzer
 
 bilibili = Blueprint("bilibili", __name__, url_prefix="/bilibili")
 
@@ -41,7 +42,7 @@ def bv_crawler():
             bv = form.bv.data
             is_second = form.is_second.data
             BilibiliCommentCrawler(bv=bv, is_second=is_second).crawl()
-            flash("开始爬取，请稍等...", "info")
+            # flash("开始爬取，请稍等...", "info")
             return redirect(url_for("bilibili.upload_file", name=bv))
 
         except Exception as e:
@@ -70,11 +71,9 @@ def uid_crawler():
                 except Exception as e:
                     print(f"爬取视频 ID: {id} 时出错: {e}")
 
-            CommentMerger().merge_comments(
-                video_ids, uid
-            )  # 可以指定输出目录
+            CommentMerger().merge_comments(video_ids, uid)  # 可以指定输出目录
 
-            flash("开始爬取，请稍等...", "info")
+            # flash("开始爬取，请稍等...", "info")
             return redirect(url_for("bilibili.upload_file", name=uid))
 
         except Exception as e:
@@ -82,36 +81,72 @@ def uid_crawler():
     return render_template("bilibili/uid_crawler.html", form=form)
 
 
-# @bilibili.route("/download/<bv>")
+# @bilibili.route("/upload/<name>")
 # @login_required
-# def download_comments(bv):
+# def upload_file(name):
 #     """处理爬取和下载CSV文件"""
-#     is_second = request.args.get("is_second", "True").lower() == "true"
-
 #     try:
-#         crawler = BilibiliCommentCrawler(bv=bv, is_second=is_second).crawl()
-#         single_pos = crawler[2]
-
+#         is_bv = is_bv_code(name)
+#         if is_bv:
+#             single_pos ="./comment/bv/" + name + ".csv"
+#         else:
+#             single_pos = "./comment/up/" + name + ".csv"
 #         # 设置文件名
-#         filename = f"{bv}.csv"
-
+#         filename = f"{name}.csv"
 #         # 返回CSV文件供下载
 #         return send_file(
 #             single_pos, as_attachment=True, download_name=filename, mimetype="text/csv"
 #         )
 #     except Exception as e:
-#         flash(f"爬取失败: {str(e)}", "danger")
-#         return redirect(url_for("bilibili.select_mode"))
+#         flash(f"上传失败: {str(e)}", "danger")
 
 
 @bilibili.route("/upload/<name>")
 @login_required
 def upload_file(name):
-    """处理爬取和下载CSV文件"""
+    """处理爬取完成后的操作选择页面"""
     try:
         is_bv = is_bv_code(name)
         if is_bv:
-            single_pos ="./comment/bv/" + name + ".csv"
+            single_pos = "./flaskstarter/comment/bv/" + name + ".csv"
+        else:
+            single_pos = "./flaskstarter/comment/up/" + name + ".csv"
+
+        # 检查文件是否存在
+        import os
+
+        if not os.path.exists(single_pos):
+            flash("评论文件不存在", "danger")
+            return redirect(url_for("bilibili.select_mode"))
+
+        # 获取文件大小和行数
+        file_size = os.path.getsize(single_pos) / 1024  # KB
+        with open(single_pos, "r", encoding="utf-8") as f:
+            line_count = sum(1 for _ in f) - 1
+
+        # 渲染结果页面，提供下载和分析选项
+        return render_template(
+            "bilibili/upload_success.html",
+            name=name,
+            is_bv=is_bv,
+            file_info={
+                "size": round(file_size, 2),
+                "line_count": line_count - 1,  # 减去标题行
+            },
+        )
+    except Exception as e:
+        flash(f"处理失败: {str(e)}", "danger")
+        return redirect(url_for("bilibili.select_mode"))
+
+
+@bilibili.route("/download/<name>")
+@login_required
+def download_file(name):
+    """直接下载CSV文件"""
+    try:
+        is_bv = is_bv_code(name)
+        if is_bv:
+            single_pos = "./comment/bv/" + name + ".csv"
         else:
             single_pos = "./comment/up/" + name + ".csv"
         # 设置文件名
@@ -121,7 +156,167 @@ def upload_file(name):
             single_pos, as_attachment=True, download_name=filename, mimetype="text/csv"
         )
     except Exception as e:
-        flash(f"上传失败: {str(e)}", "danger")
+        flash(f"下载失败: {str(e)}", "danger")
+        return redirect(url_for("bilibili.select_mode"))
+
+
+# @bilibili.route("/analyze/<name>")
+# @login_required
+# def analyze_file(name):
+#     """处理爬取和下载CSV文件"""
+#     try:
+#         is_bv = is_bv_code(name)
+#         if is_bv:
+#             single_pos = "./comment/bv/" + name + ".csv"
+#         else:
+#             single_pos = "./comment/up/" + name + ".csv"
+#         # 设置文件名
+#         filename = f"{name}.csv"
+#         # 返回CSV文件供下载
+#         # return send_file(
+#         #     single_pos, as_attachment=True, download_name=filename, mimetype="text/csv"
+#         # )
+#     except Exception as e:
+#         flash(f"分析失败: {str(e)}", "danger")
+
+# @bilibili.route("/analyze/<name>")
+# @login_required
+# def analyze_file(name):
+#     """分析评论数据并展示结果"""
+#     try:
+#         is_bv = is_bv_code(name)
+#         if is_bv:
+#             csv_file = "./flaskstarter/comment/bv/" + name + ".csv"
+#         else:
+#             csv_file = "./flaskstarter/comment/up/" + name + ".csv"
+
+#         # 导入评论分析模块
+
+#         # 分析评论
+#         analyzer = CommentAnalyzer(csv_file)
+#         stats = analyzer.get_basic_stats()  # 获取基本统计信息
+#         sentiment_chart = analyzer.generate_sentiment_chart()  # 情感分析图表
+#         word_cloud = analyzer.generate_word_cloud()  # 词云图
+#         time_distribution = analyzer.generate_time_distribution()  # 时间分布图
+
+#         # 渲染分析结果页面
+#         return render_template(
+#             "bilibili/analysis_result.html",
+#             name=name,
+#             is_bv=is_bv,
+#             stats=stats,
+#             charts={
+#                 "sentiment": sentiment_chart,
+#                 "word_cloud": word_cloud,
+#                 "time_distribution": time_distribution,
+#             },
+#         )
+#     except Exception as e:
+#         flash(f"分析失败: {str(e)}", "danger")
+#         return redirect(url_for("bilibili.select_mode"))
+
+
+@bilibili.route("/analyze/<name>")
+@login_required
+def analyze_file(name):
+    """分析评论数据并展示结果"""
+    try:
+        # 确定文件路径
+        is_bv = is_bv_code(name)
+        if is_bv:
+            csv_file = "./flaskstarter/comment/bv/" + name + ".csv"
+        else:
+            csv_file = "./flaskstarter/comment/up/" + name + ".csv"
+
+        # 检查文件是否存在
+        if not os.path.exists(csv_file):
+            flash("评论文件不存在", "danger")
+            return redirect(url_for("bilibili.select_mode"))
+
+        # 输出目录（储存图片）
+        output_dir = "./flaskstarter/static/image/" + name
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+
+        # 初始化分析器
+        analyzer = CommentAnalyzer(csv_file)
+        analyzer.output_dir = output_dir  # 设置输出目录
+
+        # 加载数据
+        if not analyzer.load_data():
+            flash("数据加载失败，请检查CSV文件格式", "danger")
+            return redirect(url_for("bilibili.upload_file", name=name))
+
+        # 运行分析并生成图表
+        try:
+            analyzer.analyze_ip_distribution()
+        except Exception as e:
+            print(f"IP分布分析失败: {e}")
+
+        try:
+            analyzer.analyze_vip_status()
+        except Exception as e:
+            print(f"大会员状态分析失败: {e}")
+
+        try:
+            analyzer.analyze_gender_distribution()
+        except Exception as e:
+            print(f"性别分布分析失败: {e}")
+
+        try:
+            analyzer.analyze_level_distribution()
+        except Exception as e:
+            print(f"用户等级分析失败: {e}")
+
+        try:
+            analyzer.analyze_comment_time_trend()
+        except Exception as e:
+            print(f"评论时间趋势分析失败: {e}")
+
+        try:
+            analyzer.analyze_comment_hour_distribution()
+        except Exception as e:
+            print(f"评论小时分布分析失败: {e}")
+
+        try:
+            analyzer.generate_wordcloud()
+        except Exception as e:
+            print(f"词云生成失败: {e}")
+
+        # 收集生成的图表文件
+        chart_files = {
+            "ip_distribution": "user_ip_top10_distribution.png",
+            "vip_status": "user_vip_status.png",
+            "gender_distribution": "user_gender_distribution.png",
+            "level_distribution": "user_level_distribution.png",
+            "time_trend": "comment_time_trend.png",
+            "hour_distribution": "comment_hour_distribution.png",
+            "wordcloud": "comment_wordcloud.png",
+        }
+
+        # 统计基本数据
+        stats = {
+            "total_comments": len(analyzer.df),
+            "unique_users": (
+                len(analyzer.df_unique_users)
+                if analyzer.df_unique_users is not None
+                else 0
+            ),
+            "file_size": os.path.getsize(csv_file) / 1024,  # KB
+        }
+
+        # 渲染分析结果页面
+        return render_template(
+            "bilibili/analysis_result.html",
+            name=name,
+            is_bv=is_bv,
+            stats=stats,
+            chart_files=chart_files,
+            static_path=f"/static/image/{name}/",
+        )
+    except Exception as e:
+        flash(f"分析失败: {str(e)}", "danger")
+        return redirect(url_for("bilibili.upload_file", name=name))
 
 
 def is_bv_code(input_string):

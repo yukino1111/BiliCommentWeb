@@ -1,0 +1,62 @@
+{% from "macros/_form.html" import render_form %} {% set page_title =
+    'B站评论爬虫' %} {% extends 'layouts/base.html' %} {% block body %}
+<div class="container mt-5 pt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow-lg border-0 rounded-lg">
+        <div class="card-header bg-gradient-success text-white text-center py-4">
+          <h4 class="m-0"><i class="bi bi-check-circle-fill mr-2"></i> 评论爬取成功</h4>
+        </div>
+        <div class="card-body p-5 text-center">
+          <div class="success-icon mb-4">
+            <i class="bi bi-check-circle text-success" style="font-size: 4rem;"></i>
+          </div>
+          
+          <h5 class="card-title font-weight-bold mb-4">
+            {% if is_bv %}
+              已成功爬取视频 {{ name }} 的评论
+            {% else %}
+              已成功爬取UP主 {{ name }} 的评论
+            {% endif %}
+          </h5>
+          
+          <div class="alert alert-info">
+            <div class="row">
+              <div class="col-md-6">
+                <p class="mb-1"><strong>评论数量:</strong> {{ file_info.line_count }} 条</p>
+              </div>
+              <div class="col-md-6">
+                <p class="mb-1"><strong>文件大小:</strong> {{ file_info.size }} KB</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="mt-5">
+            <p class="mb-4">你可以选择下载评论数据或对评论进行分析:</p>
+            
+            <a href="{{ url_for('bilibili.download_file', name=name) }}" class="btn btn-primary btn-lg px-4 me-3">
+              <i class="bi bi-download mr-2"></i> 下载评论
+            </a>
+            
+            <a href="{{ url_for('bilibili.analyze_file', name=name) }}" class="btn btn-info btn-lg px-4">
+              <i class="bi bi-graph-up mr-2"></i> 分析评论
+            </a>
+          </div>
+          
+          <div class="mt-5">
+            <a href="{{ url_for('bilibili.select_mode') }}" class="btn btn-outline-secondary">
+              <i class="bi bi-arrow-left mr-2"></i> 返回首页
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .bg-gradient-success {
+    background: linear-gradient(45deg, #28a745, #20c997);
+  }
+</style>
+{% endblock %}

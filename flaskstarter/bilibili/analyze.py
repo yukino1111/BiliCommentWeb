@@ -1,4 +1,7 @@
 import pandas as pd
+import matplotlib
+
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
 import seaborn as sns
@@ -6,6 +9,7 @@ from wordcloud import WordCloud
 import jieba
 import os
 import re
+
 
 class CommentAnalyzer:
     def __init__(
@@ -22,9 +26,9 @@ class CommentAnalyzer:
             output_dir (str): 保存图片的文件夹路径。
         """
         self.csv_path = csv_path
-        self.font_path = "./assets/fonts/PingFang-Medium.ttf"
-        self.stopwords_path = "./assets/hit_stopwords.txt"
-        self.output_dir = "./image"
+        self.font_path = "./flaskstarter/assets/fonts/PingFang-Medium.ttf"
+        self.stopwords_path = "./flaskstarter/assets/hit_stopwords.txt"
+        self.output_dir = "./flaskstarter/static/image"
         self.df = None  # 存储原始评论数据
         self.df_unique_users = None  # 存储按用户ID去重后的数据
         self._setup_matplotlib_font()  # 设置matplotlib字体
@@ -102,7 +106,7 @@ class CommentAnalyzer:
         plt.xticks(rotation=45, ha="right")
         plt.tight_layout()
         plt.savefig(os.path.join(self.output_dir, "user_ip_top10_distribution.png"))
-        plt.show()
+        # plt.show()
         print("已生成用户IP属地 Top 10 分布图。")
 
     def analyze_vip_status(self):
@@ -118,7 +122,7 @@ class CommentAnalyzer:
         plt.title("用户大会员状态分布")
         plt.axis("equal")
         plt.savefig(os.path.join(self.output_dir, "user_vip_status.png"))
-        plt.show()
+        # plt.show()
         print("已生成用户大会员状态分布图。")
 
     def analyze_gender_distribution(self):
@@ -136,7 +140,7 @@ class CommentAnalyzer:
         plt.title("用户性别分布")
         plt.axis("equal")
         plt.savefig(os.path.join(self.output_dir, "user_gender_distribution.png"))
-        plt.show()
+        # plt.show()
         print("已生成用户性别分布图。")
 
     def analyze_level_distribution(self):
@@ -154,7 +158,7 @@ class CommentAnalyzer:
         plt.title("用户等级分布")
         plt.axis("equal")
         plt.savefig(os.path.join(self.output_dir, "user_level_distribution.png"))
-        plt.show()
+        # plt.show()
         print("已生成用户等级分布图。")
 
     def analyze_comment_time_trend(self):
@@ -200,7 +204,7 @@ class CommentAnalyzer:
         plt.grid(True)
         plt.tight_layout()
         plt.savefig(os.path.join(self.output_dir, "comment_time_trend.png"))
-        plt.show()
+        # plt.show()
         print("已生成评论数量随时间变化趋势图。")
 
     def analyze_comment_hour_distribution(self):
@@ -226,7 +230,7 @@ class CommentAnalyzer:
         plt.xticks(range(24))  # 确保显示所有24小时
         plt.tight_layout()
         plt.savefig(os.path.join(self.output_dir, "comment_hour_distribution.png"))
-        plt.show()
+        # plt.show()
         print("已生成评论数量按小时分布图。")
 
     def generate_wordcloud(self):
@@ -270,7 +274,7 @@ class CommentAnalyzer:
         plt.axis("off")
         plt.title("评论内容词云")
         plt.savefig(os.path.join(self.output_dir, "comment_wordcloud.png"))
-        plt.show()
+        # plt.show()
         print("已生成评论内容词云。")
 
     def run_all_analysis(self):
@@ -293,3 +297,258 @@ if __name__ == "__main__":
     # 确保这个路径正确，可以使用绝对路径
     analyzer = CommentAnalyzer(csv_file)
     analyzer.run_all_analysis()
+
+
+# import pandas as pd
+# import matplotlib.pyplot as plt
+# import numpy as np
+# from wordcloud import WordCloud
+# import jieba
+# import base64
+# from io import BytesIO
+# from collections import Counter
+# import re
+# from datetime import datetime
+# import seaborn as sns
+# from snownlp import SnowNLP
+
+
+# class CommentAnalyzer:
+#     def __init__(self, csv_file):
+#         """初始化评论分析器"""
+#         self.df = pd.read_csv(csv_file, encoding="utf-8")
+#         # 预处理数据
+#         self._preprocess_data()
+
+#     def _preprocess_data(self):
+#         """预处理评论数据"""
+#         # 根据实际CSV结构处理数据
+#         # 假设CSV有以下列: content, time, like, user
+#         if "content" not in self.df.columns:
+#             # 尝试其他可能的列名
+#             possible_content_cols = ["评论内容", "内容", "comment"]
+#             for col in possible_content_cols:
+#                 if col in self.df.columns:
+#                     self.df.rename(columns={col: "content"}, inplace=True)
+#                     break
+
+#         # 确保所需列存在
+#         required_columns = {
+#             "time": ["时间", "time", "评论时间"],
+#             "like": ["点赞数", "like", "likes"],
+#             "user": ["用户名", "user", "用户", "username"],
+#         }
+
+#         for target, possible_cols in required_columns.items():
+#             if target not in self.df.columns:
+#                 for col in possible_cols:
+#                     if col in self.df.columns:
+#                         self.df.rename(columns={col: target}, inplace=True)
+#                         break
+
+#     def get_basic_stats(self):
+#         """获取基本统计信息"""
+#         stats = {
+#             "total_comments": len(self.df),
+#             "unique_users": (
+#                 len(self.df["user"].unique()) if "user" in self.df.columns else 0
+#             ),
+#             "avg_length": (
+#                 round(self.df["content"].str.len().mean(), 1)
+#                 if "content" in self.df.columns
+#                 else 0
+#             ),
+#             "avg_likes": (
+#                 round(self.df["like"].mean(), 1) if "like" in self.df.columns else 0
+#             ),
+#         }
+#         return stats
+
+#     def _fig_to_base64(self, fig):
+#         """将matplotlib图表转换为base64编码的字符串"""
+#         buf = BytesIO()
+#         fig.savefig(buf, format="png", bbox_inches="tight")
+#         buf.seek(0)
+#         img_str = base64.b64encode(buf.read()).decode("utf-8")
+#         buf.close()
+#         plt.close(fig)
+#         return img_str
+
+#     def generate_sentiment_chart(self):
+#         """生成情感分析图表"""
+#         if "content" not in self.df.columns or len(self.df) == 0:
+#             # 创建一个空图表
+#             fig, ax = plt.subplots(figsize=(10, 6))
+#             ax.text(0.5, 0.5, "无有效评论数据", ha="center", va="center", fontsize=14)
+#             ax.axis("off")
+#             return self._fig_to_base64(fig)
+
+#         # 计算情感分数
+#         sentiment_scores = []
+#         for comment in self.df["content"].dropna():
+#             try:
+#                 score = SnowNLP(comment).sentiments
+#                 sentiment_scores.append(score)
+#             except:
+#                 sentiment_scores.append(0.5)  # 默认为中性
+
+#         # 定义情感类别
+#         sentiment_categories = []
+#         for score in sentiment_scores:
+#             if score < 0.3:
+#                 sentiment_categories.append("负面")
+#             elif score > 0.7:
+#                 sentiment_categories.append("正面")
+#             else:
+#                 sentiment_categories.append("中性")
+
+#         # 计算各类别比例
+#         sentiment_counts = Counter(sentiment_categories)
+
+#         # 创建图表
+#         fig, ax = plt.subplots(figsize=(10, 6))
+#         colors = ["#FF6B6B", "#FFD166", "#06D6A0"]
+
+#         counts = [
+#             sentiment_counts.get("负面", 0),
+#             sentiment_counts.get("中性", 0),
+#             sentiment_counts.get("正面", 0),
+#         ]
+
+#         wedges, texts, autotexts = ax.pie(
+#             counts,
+#             labels=["负面", "中性", "正面"],
+#             colors=colors,
+#             autopct="%1.1f%%",
+#             startangle=90,
+#             wedgeprops={"edgecolor": "w", "linewidth": 2},
+#         )
+
+#         # 设置字体属性
+#         plt.setp(autotexts, size=10, weight="bold", color="white")
+#         plt.setp(texts, size=12)
+
+#         ax.set_title("评论情感分析", fontsize=16, pad=20)
+
+#         return self._fig_to_base64(fig)
+
+#     def generate_word_cloud(self):
+#         """生成词云图"""
+#         if "content" not in self.df.columns or len(self.df) == 0:
+#             # 创建一个空图表
+#             fig, ax = plt.subplots(figsize=(10, 8))
+#             ax.text(0.5, 0.5, "无有效评论数据", ha="center", va="center", fontsize=14)
+#             ax.axis("off")
+#             return self._fig_to_base64(fig)
+
+#         # 合并所有评论
+#         text = " ".join(self.df["content"].dropna().astype(str))
+
+#         # 使用jieba进行分词
+#         words = jieba.cut(text)
+
+#         # 过滤停用词
+#         stop_words = set(
+#             [
+#                 "的",
+#                 "了",
+#                 "和",
+#                 "是",
+#                 "就",
+#                 "都",
+#                 "而",
+#                 "及",
+#                 "与",
+#                 "着",
+#                 "或",
+#                 "一个",
+#                 "没有",
+#                 "还是",
+#                 "这个",
+#                 "那个",
+#                 "这些",
+#                 "那些",
+#             ]
+#         )
+#         filtered_words = [
+#             word for word in words if word not in stop_words and len(word) > 1
+#         ]
+
+#         # 统计词频
+#         word_counts = Counter(filtered_words)
+
+#         # 生成词云
+#         wordcloud = WordCloud(
+#             font_path="simhei.ttf",  # 使用支持中文的字体
+#             width=800,
+#             height=600,
+#             background_color="white",
+#             max_words=100,
+#             max_font_size=150,
+#             random_state=42,
+#         ).generate_from_frequencies(word_counts)
+
+#         # 创建图表
+#         fig, ax = plt.subplots(figsize=(10, 8))
+#         ax.imshow(wordcloud, interpolation="bilinear")
+#         ax.axis("off")
+
+#         return self._fig_to_base64(fig)
+
+#     def generate_time_distribution(self):
+#         """生成评论时间分布图"""
+#         if "time" not in self.df.columns or len(self.df) == 0:
+#             # 创建一个空图表
+#             fig, ax = plt.subplots(figsize=(12, 6))
+#             ax.text(0.5, 0.5, "无有效时间数据", ha="center", va="center", fontsize=14)
+#             ax.axis("off")
+#             return self._fig_to_base64(fig)
+
+#         try:
+#             # 尝试解析时间
+#             time_col = self.df["time"].astype(str)
+
+#             # 提取小时信息
+#             hours = []
+#             for time_str in time_col:
+#                 # 尝试多种常见时间格式
+#                 try:
+#                     # 尝试从完整日期时间中提取
+#                     match = re.search(r"(\d{1,2})[:时]", time_str)
+#                     if match:
+#                         hours.append(int(match.group(1)))
+#                     else:
+#                         # 尝试直接解析整数
+#                         hours.append(int(time_str) % 24)
+#                 except:
+#                     continue
+
+#             if not hours:
+#                 raise ValueError("无法解析时间数据")
+
+#             # 绘制时间分布图
+#             fig, ax = plt.subplots(figsize=(12, 6))
+#             sns.histplot(hours, bins=24, kde=True, ax=ax)
+
+#             ax.set_title("评论时间分布", fontsize=16)
+#             ax.set_xlabel("小时", fontsize=12)
+#             ax.set_ylabel("评论数量", fontsize=12)
+#             ax.set_xticks(range(0, 24))
+
+#             # 添加背景网格
+#             ax.grid(linestyle="--", alpha=0.7)
+
+#             return self._fig_to_base64(fig)
+#         except Exception as e:
+#             # 创建错误提示图表
+#             fig, ax = plt.subplots(figsize=(12, 6))
+#             ax.text(
+#                 0.5,
+#                 0.5,
+#                 f"时间数据解析失败: {str(e)}",
+#                 ha="center",
+#                 va="center",
+#                 fontsize=14,
+#             )
+#             ax.axis("off")
+#             return self._fig_to_base64(fig)
