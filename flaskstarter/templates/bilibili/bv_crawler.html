@@ -1,0 +1,59 @@
+{% from "macros/_form.html" import render_form %} {% set page_title =
+    'B站评论爬虫' %} {% extends 'layouts/base.html' %} {% block body %}
+    <div class="container mt-5 pt-5">
+        <div class="text-center mb-5">
+          <img src="https://www.bilibili.com/favicon.ico" width="50" alt="B站图标" class="mb-3">
+          <h3 class="text-primary font-weight-bold">B站评论爬虫工具</h3>
+          <p class="text-muted">快速获取B站评论数据</p>
+        </div>
+      
+        <div class="row justify-content-center">
+          <div class="col-md-7">
+            <div class="card shadow-lg border-0 rounded-lg">
+              <div class="card-header bg-gradient-primary text-white text-center py-3">
+                <h5 class="m-0"><i class="bi bi-play-circle mr-2"></i>爬取视频评论（通过BV号）</h5>
+              </div>
+              <div class="card-body p-4">
+                <!-- <div class="alert alert-info">
+                  <small><i class="bi bi-info-circle"></i> 提示：请输入完整的BV号，例如 BV1xx411c7mD</small>
+                </div> -->
+                
+                <form method="POST" action="{{ url_for('bilibili.bv_crawler') }}">
+                  {{ form.csrf_token }}
+                  
+                  <div class="form-group mb-4">
+                    <label class="form-label fw-bold">{{ form.bv.label }}</label>
+                    {{ form.bv(class="form-control form-control-lg", placeholder="BV1xx411c7mD") }}
+                    {% if form.bv.errors %}
+                    <div class="text-danger mt-2">
+                      {% for error in form.bv.errors %}
+                      <small><i class="bi bi-exclamation-triangle"></i> {{ error }}</small>
+                      {% endfor %}
+                    </div>
+                    {% endif %}
+                  </div>
+                  
+                  <div class="form-check mb-4">
+                    {{ form.is_second(class="form-check-input") }}
+                    <label class="form-check-label" for="{{ form.is_second.id }}">
+                      {{ form.is_second.label.text }} <span class="badge bg-secondary text-white">推荐</span>
+                    </label>
+                  </div>
+                  
+                  <div class="form-group d-flex justify-content-between mt-4">
+                    {{ form.submit(class="btn btn-primary px-4") }}
+                    <a href="{{ url_for('bilibili.select_mode') }}" class="btn btn-outline-secondary">返回选择</a>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <style>
+        .bg-gradient-primary {
+          background: linear-gradient(45deg, #00a1d6, #00b5e5);
+        }
+      </style>
+{% endblock %}

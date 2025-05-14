@@ -1,32 +1,82 @@
 {% from "macros/_form.html" import render_form %} {% set page_title =
 'B站评论爬虫' %} {% extends 'layouts/base.html' %} {% block body %}
-<div class="container">
-  <div class="row mt-5">
-    <div class="col-lg-6 offset-3">
-      <h2 class="mb-4">B站视频评论爬虫</h2>
-      <div class="card">
-        <div class="card-body">
-          <p class="card-text">
-            输入B站视频BV号，下载该视频下的评论数据（CSV格式）
-          </p>
-          <p class="card-text text-muted">
-            BV号形如：BV1awjwzmEao，可从视频链接中获取
-          </p>
-          {{ render_form(url_for('bilibili.crawler'), form) }}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-7">
+      <div class="card shadow-lg border-0 rounded-lg">
+        <div class="card-header bg-primary text-white text-center py-4">
+          <h4 class="m-0"><i class="fas fa-comment-dots mr-2"></i>B站评论爬虫</h4>
         </div>
-      </div>
-
-      <div class="alert alert-info mt-4">
-        <h5>使用说明:</h5>
-        <ul>
-          <li>输入视频的BV号（以BV开头的12位字符）</li>
-          <li>选择是否爬取二级评论（回复）</li>
-          <li>点击"开始爬取"按钮开始下载</li>
-          <li>爬取过程可能需要几秒钟至几分钟，请耐心等待</li>
-          <li>下载完成后将自动保存CSV文件到您的设备</li>
-        </ul>
+        <div class="card-body p-5">
+          <div class="text-center mb-4">
+            <img src="https://www.bilibili.com/favicon.ico" width="48" alt="B站图标" class="mb-3">
+            <h5 class="card-title font-weight-bold">请选择爬取方式</h5>
+            <p class="text-muted">选择合适的模式开始爬取B站评论</p>
+          </div>
+          
+          <form method="POST" action="{{ url_for('bilibili.select_mode') }}">
+            {{ form.csrf_token }}
+            
+            <div class="form-group mb-4">
+              <label class="form-label font-weight-bold mb-3">{{ form.mode.label }}</label>
+              <div class="mode-options">
+                {% for subfield in form.mode %}
+                <div class="mode-option mb-3">
+                  <div class="card {% if loop.index == 1 %}border-primary{% else %}border-secondary{% endif %} hover-shadow">
+                    <div class="card-body">
+                      <div class="custom-control custom-radio">
+                        {{ subfield(class="custom-control-input") }}
+                        <label class="custom-control-label d-block" for="{{ subfield.id }}">
+                          {% if loop.index == 1 %}
+                          <i class="fas fa-film text-primary mr-2"></i>
+                          {% else %}
+                          <i class="fas fa-user text-secondary mr-2"></i>
+                          {% endif %}
+                          <strong>{{ subfield.label.text }}</strong>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+            
+            <div class="form-group text-center">
+              {{ form.submit(class="btn btn-primary btn-lg px-5") }}
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   </div>
 </div>
+
+<style>
+  .hover-shadow:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+    transition: all 0.3s ease;
+  }
+  .mode-option .card {
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .custom-control-input:checked ~ .custom-control-label::before {
+    border-color: #007bff;
+    background-color: #007bff;
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // 点击卡片时选中对应的单选按钮
+    document.querySelectorAll('.mode-option .card').forEach(function(card) {
+      card.addEventListener('click', function() {
+        const radio = this.querySelector('input[type="radio"]');
+        radio.checked = true;
+      });
+    });
+  });
+</script>
 {% endblock %}
