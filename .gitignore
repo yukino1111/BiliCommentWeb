@@ -18,3 +18,4 @@ bili_cookie.txt
 *.csv
 bili_cookie.txt
 ./flaskstarter/assets/chrome_user_data/
+./flaskstarter/static/image/*.png
