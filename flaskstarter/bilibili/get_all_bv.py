@@ -72,14 +72,6 @@ class GetInfo:
                 if id:  # 确保获取到了id
                     self.a_list.append(id)
 
-            # # 将当前获取到的id列表保存到文件
-            # with open("url.json", "w+", encoding="utf-8") as f:
-            #     # 将列表转换为JSON格式字符串，确保中文字符正常保存
-            #     data = json.dumps(self.a_list, ensure_ascii=False)
-            #     # 将JSON字符串写入文件
-            #     f.write(data)
-            # print(f"已获取当前页面视频id，总数: {len(self.a_list)}")
-
         except Exception as e:
             print(f"获取当前页面视频id失败: {e}")
 

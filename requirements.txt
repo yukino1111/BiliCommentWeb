@@ -12,6 +12,7 @@ pandas==2.2.3
 Requests==2.32.3
 seaborn==0.13.2
 selenium==4.32.0
+snownlp==0.12.3
 SQLAlchemy==1.4.46
 webdriver_manager==4.0.2
 Werkzeug==2.0.0

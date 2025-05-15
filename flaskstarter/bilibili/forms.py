@@ -7,13 +7,12 @@ class BVCrawlerForm(FlaskForm):
     """视频评论爬取表单（通过BV号）"""
 
     bv = StringField(
-        "BV号",
+        'BV号',
         [
             InputRequired(),
-            Length(min=12, max=12),
             Regexp(
-                r"^BV[a-zA-Z0-9]{10}$",
-                message="请输入正确格式的BV号",
+                r"^(BV[a-zA-Z0-9]{10},)*BV[a-zA-Z0-9]{10}$|^BV[a-zA-Z0-9]{10}$",
+                message="请输入正确格式的格式",
             ),
         ],
     )

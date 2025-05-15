@@ -11,19 +11,16 @@
           <div class="col-md-7">
             <div class="card shadow-lg border-0 rounded-lg">
               <div class="card-header bg-gradient-primary text-white text-center py-3">
-                <h5 class="m-0"><i class="bi bi-play-circle mr-2"></i>爬取视频评论（通过BV号）</h5>
+                <h5 class="m-0"><i class="bi bi-play-circle mr-2"></i>爬取视频评论（通过BV号，多个BV号用逗号间隔）</h5>
               </div>
               <div class="card-body p-4">
-                <!-- <div class="alert alert-info">
-                  <small><i class="bi bi-info-circle"></i> 提示：请输入完整的BV号，例如 BV1xx411c7mD</small>
-                </div> -->
                 
                 <form method="POST" action="{{ url_for('bilibili.bv_crawler') }}">
                   {{ form.csrf_token }}
                   
                   <div class="form-group mb-4">
                     <label class="form-label fw-bold">{{ form.bv.label }}</label>
-                    {{ form.bv(class="form-control form-control-lg", placeholder="BV1xx411c7mD") }}
+                    {{ form.bv(class="form-control form-control-lg") }}
                     {% if form.bv.errors %}
                     <div class="text-danger mt-2">
                       {% for error in form.bv.errors %}

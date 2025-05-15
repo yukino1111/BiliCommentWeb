@@ -136,9 +136,9 @@
   .chart-img-container {
     flex: 2; /* 图表占据更多空间 */
     /* 调整宽度 */
-    max-width: 600px; /* 设置一个最大宽度，避免过大 */
+    max-width: auto; /* 设置一个最大宽度，避免过大 */
     width: 100%; /* 确保在小于最大宽度时能自适应 */
-    min-width: 300px; /* 最小宽度 */
+    min-width: auto; /* 最小宽度 */
     margin: 0 auto 20px auto; /* 居中显示，并增加下方外边距 */
     text-align: center; /* 容器内图片居中 */
   }
@@ -305,12 +305,6 @@
           alt="IP属地分布"
           onerror="this.onerror=null; this.src='/static/img/chart_error.png'; this.alt='图表加载失败'"
         />
-      </div>
-      <p class="chart-description">
-        <i class="bi bi-info-circle-fill"></i> 此图表展示了评论用户IP属地的Top
-        10分布，反映了观众的地域分布特征。
-      </p>
-    </div>
   </section>
 
   <!-- VIP Status -->
@@ -324,12 +318,6 @@
           alt="大会员状态"
           onerror="this.onerror=null; this.src='/static/img/chart_error.png'; this.alt='图表加载失败'"
         />
-      </div>
-      <p class="chart-description">
-        <i class="bi bi-info-circle-fill"></i>
-        此图表展示了评论用户中大会员和非大会员的比例。
-      </p>
-    </div>
   </section>
 
   <!-- Two-column charts row -->
@@ -348,12 +336,6 @@
               alt="性别分布"
               onerror="this.onerror=null; this.src='/static/img/chart_error.png'; this.alt='图表加载失败'"
             />
-          </div>
-          <p class="chart-description">
-            <i class="bi bi-info-circle-fill"></i>
-            此图表展示了评论用户的性别分布比例。
-          </p>
-        </div>
       </section>
     </div>
 
@@ -371,12 +353,6 @@
               alt="用户等级"
               onerror="this.onerror=null; this.src='/static/img/chart_error.png'; this.alt='图表加载失败'"
             />
-          </div>
-          <p class="chart-description">
-            <i class="bi bi-info-circle-fill"></i>
-            此图表展示了评论用户的B站等级分布情况。
-          </p>
-        </div>
       </section>
     </div>
   </div>
@@ -394,12 +370,6 @@
           alt="评论时间趋势"
           onerror="this.onerror=null; this.src='/static/img/chart_error.png'; this.alt='图表加载失败'"
         />
-      </div>
-      <p class="chart-description">
-        <i class="bi bi-info-circle-fill"></i>
-        此图表展示了评论数量随时间的变化趋势，可以看出视频热度变化。
-      </p>
-    </div>
   </section>
 
   <!-- Hour Distribution -->
@@ -413,12 +383,19 @@
           alt="评论小时分布"
           onerror="this.onerror=null; this.src='/static/img/chart_error.png'; this.alt='图表加载失败'"
         />
-      </div>
-      <p class="chart-description">
-        <i class="bi bi-info-circle-fill"></i>
-        此图表展示了评论发布的小时分布，可以看出用户活跃的高峰期。
-      </p>
-    </div>
+  </section>
+
+  <!-- sentiment -->
+  <section class="chart-section" data-chart-id="sentiment">
+    <h2 class="chart-title"><i class="bi bi-emoji-smile"></i>评论情感分布</h2>
+    <div class="chart-content">
+      <div class="chart-img-container">
+        <img
+          src="{{ static_path + chart_files.sentiment }}"
+          class="chart-img"
+          alt="评论情感分布"
+          onerror="this.onerror=null; this.src='/static/img/chart_error.png'; this.alt='图表加载失败'"
+        />
   </section>
 
   <!-- Wordcloud -->
@@ -432,12 +409,6 @@
           alt="评论词云"
           onerror="this.onerror=null; this.src='/static/img/chart_error.png'; this.alt='图表加载失败'"
         />
-      </div>
-      <p class="chart-description">
-        <i class="bi bi-info-circle-fill"></i>
-        此词云展示了评论中最常出现的关键词，字体大小代表词频。
-      </p>
-    </div>
   </section>
 
   <!-- Floating button -->

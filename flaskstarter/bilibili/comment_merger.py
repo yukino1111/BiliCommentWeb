@@ -20,28 +20,19 @@ class CommentMerger:
     def merge_comments(
         self,
         video_ids,
-        up_id,
-        output_dir="./flaskstarter/comment/up/",
+        id,
+        output_dir="./flaskstarter/comment/",
         output_filename=None,
     ):
-        """
-        合并指定视频的评论 CSV 文件，并添加 BV 号列。
-
-        Args:
-            video_ids (list): 包含要合并的视频 BV 号的列表。
-            up_id (str): 用户标识，用于命名输出文件。
-            output_dir (str, optional): 合并后 CSV 文件的输出目录。
-                                         默认为当前目录 ("./")。
-            output_filename (str, optional): 合并后 CSV 文件名。如果为 None，
-                                              将使用 "{up_id}.csv" 作为文件名。
-
-        Returns:
-            str or None: 合并后 CSV 文件的完整路径，如果合并失败则返回 None。
-        """
+        is_bv = is_bv_code(id)
+        if is_bv:
+            output_dir += "bv/"
+        else:
+            output_dir += "up/"
         all_comments = []
         valid_files_count = 0
 
-        print(f"开始合并用户 {up_id} 的评论文件...")
+        print(f"开始合并用户评论文件...")
 
         for bv in video_ids:
             file_path = os.path.join(self.base_comment_dir, f"{bv}.csv")
@@ -78,7 +69,7 @@ class CommentMerger:
 
         # 指定输出文件名和路径
         if output_filename is None:
-            output_filename = f"{up_id}.csv"
+            output_filename = f"{id}.csv"
         output_path = os.path.join(output_dir, output_filename)
 
         # 确保输出目录存在
@@ -97,6 +88,14 @@ class CommentMerger:
         except Exception as e:
             print(f"保存合并文件到 {output_path} 时发生错误：{e}")
             return None
+
+
+def is_bv_code(input_string):
+    # 转换为小写进行比较，实现大小写不敏感
+    if input_string.lower().startswith("bv"):
+        return 1
+    else:
+        return 0
 
 
 # 示例用法 (这部分代码在导入 CommentMerger 类时不会自动执行)
