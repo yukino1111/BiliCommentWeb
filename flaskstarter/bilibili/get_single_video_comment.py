@@ -10,7 +10,12 @@ import csv
 
 
 class BilibiliCommentCrawler:
-    def __init__(self, bv=None, is_second=True, cookie_path="./flaskstarter/assets/bili_cookie.txt"):
+    def __init__(
+        self,
+        bv=None,
+        is_second=True,
+        cookie_path="./flaskstarter/assets/bili_cookie.txt",
+    ):
         """
         初始化爬虫
         :param bv: 视频的BV号
@@ -87,7 +92,9 @@ class BilibiliCommentCrawler:
             "utf-8"
         )
         comment = json.loads(comment)
-
+        if comment["data"]["cursor"]["mode"] == 3:
+            print(f"评论爬取完成！总共爬取{self.count}条。")
+            return False
         for reply in comment["data"]["replies"]:
             # 评论数量+1
             self.count += 1
