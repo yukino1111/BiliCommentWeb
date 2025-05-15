@@ -39,7 +39,7 @@ class BilibiliCommentCrawler:
     # 通过bv号，获取视频的oid
     def get_information(self):
         resp = requests.get(
-            f"https://www.bilibili.com/video/{self.bv}/?p=14&spm_id_from=pageDriver&vd_source=cd6ee6b033cd2da64359bad72619ca8a",
+            f"https://www.bilibili.com/video/{self.bv}/",
             headers=self.get_Header(),
         )
         # 提取视频oid
