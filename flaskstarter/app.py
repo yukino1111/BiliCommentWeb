@@ -5,7 +5,7 @@ from flask import Flask
 from .config import DefaultConfig
 from .user import Users, UsersAdmin
 from .settings import settings
-from .frontend import frontend, ContactUsAdmin
+from .frontend import frontend
 from .bilibili import bilibili  # 添加这一行
 from .extensions import db, mail, cache, login_manager, admin
 from .utils import INSTANCE_FOLDER_PATH, pretty_date
@@ -63,7 +63,6 @@ def configure_extensions(app):
     cache.init_app(app)
 
     # flask-admin
-    admin.add_view(ContactUsAdmin(db.session))
     admin.add_view(UsersAdmin(db.session))
     admin.init_app(app)
 

@@ -13,8 +13,7 @@ from flask_login import (login_required, login_user, current_user,
 from ..user import Users, ACTIVE
 from ..extensions import db, login_manager
 from .forms import (SignupForm, LoginForm, RecoverPasswordForm,
-                    ChangePasswordForm, ContactUsForm)
-from .models import ContactUs
+                    ChangePasswordForm)
 
 from ..emails import send_async_email
 
@@ -39,21 +38,7 @@ def index():
     return render_template('frontend/landing.html', _active_home=True)
 
 
-@frontend.route('/contact-us', methods=['GET', 'POST'])
-def contact_us():
-    form = ContactUsForm()
 
-    if form.validate_on_submit():
-        _contact = ContactUs()
-        form.populate_obj(_contact)
-        db.session.add(_contact)
-        db.session.commit()
-
-        flash('Thanks! We\'ll get back to you shortly!', 'success')
-
-        return redirect(url_for('frontend.contact_us'))
-
-    return render_template('frontend/contact_us.html', form=form)
 
 
 @frontend.route('/login', methods=['GET', 'POST'])

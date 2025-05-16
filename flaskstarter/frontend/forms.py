@@ -54,9 +54,3 @@ class ChangePasswordForm(FlaskForm):
     submit = SubmitField('Save')
 
 
-class ContactUsForm(FlaskForm):
-    name = StringField(u'Name', [InputRequired(), Length(max=64)])
-    email = EmailField(u'Your Email', [InputRequired(), Email(), Length(max=64)])
-    subject = StringField(u'Subject', [InputRequired(), Length(5, 128)])
-    message = TextAreaField(u'Your Message', [InputRequired(), Length(10, 1024)])
-    submit = SubmitField('Submit')
