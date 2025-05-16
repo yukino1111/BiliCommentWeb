@@ -5,7 +5,6 @@ from flask import Flask
 from .config import DefaultConfig
 from .user import Users, UsersAdmin
 from .settings import settings
-from .tasks import tasks, MyTaskModelAdmin
 from .frontend import frontend, ContactUsAdmin
 from .bilibili import bilibili  # 添加这一行
 from .extensions import db, mail, cache, login_manager, admin
@@ -15,7 +14,7 @@ from .utils import INSTANCE_FOLDER_PATH, pretty_date
 # For import *
 __all__ = ["create_app"]
 
-DEFAULT_BLUEPRINTS = (frontend, settings, tasks, bilibili)  # 添加这一行
+DEFAULT_BLUEPRINTS = (frontend, settings, bilibili)  # 添加这一行
 
 
 def create_app(config=None, app_name=None, blueprints=None):
@@ -66,7 +65,6 @@ def configure_extensions(app):
     # flask-admin
     admin.add_view(ContactUsAdmin(db.session))
     admin.add_view(UsersAdmin(db.session))
-    admin.add_view(MyTaskModelAdmin(db.session))
     admin.init_app(app)
 
     @login_manager.user_loader

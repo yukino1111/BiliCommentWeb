@@ -10,7 +10,6 @@ from flask_login import (login_required, login_user, current_user,
                          logout_user, login_fresh)
 
 
-from ..tasks import MyTaskForm
 from ..user import Users, ACTIVE
 from ..extensions import db, login_manager
 from .forms import (SignupForm, LoginForm, RecoverPasswordForm,
@@ -27,9 +26,8 @@ frontend = Blueprint('frontend', __name__)
 @login_required
 def dashboard():
 
-    _task_form = MyTaskForm()
 
-    return render_template('dashboard/dashboard.html', task_form=_task_form, _active_dash=True)
+    return render_template('dashboard/dashboard.html', _active_dash=True)
 
 
 @frontend.route('/')

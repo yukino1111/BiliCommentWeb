@@ -5,7 +5,6 @@ from sqlalchemy.orm.mapper import configure_mappers
 from flaskstarter import create_app
 from flaskstarter.extensions import db
 from flaskstarter.user import Users, ADMIN, USER, ACTIVE
-from flaskstarter.tasks import MyTaskModel
 
 from flaskstarter.utils import INSTANCE_FOLDER_PATH
 
@@ -36,10 +35,6 @@ def initdb():
                      status_code=ACTIVE)
         db.session.add(user)
 
-    for i in range(1, 5):
-        _task = MyTaskModel(task="Task Random Number ## " + str(i), users_id=2)
-
-        db.session.add(_task)
 
     db.session.commit()
 
