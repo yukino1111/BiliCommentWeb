@@ -26,7 +26,6 @@ frontend = Blueprint('frontend', __name__)
 @login_required
 def dashboard():
 
-
     return render_template('dashboard/dashboard.html', _active_dash=True)
 
 

@@ -35,7 +35,6 @@ def initdb():
                      status_code=ACTIVE)
         db.session.add(user)
 
-
     db.session.commit()
 
     print("Database initialized with 2 users (admin, demo)")

@@ -1,6 +1,7 @@
 {% if current_user.is_authenticated %}
 <div class="collapse navbar-collapse" id="navbarResponsive">
   <ul class="navbar-nav ml-auto">
+
     <!-- 添加B站爬虫菜单项 -->
     <li class="nav-item">
       <a class="nav-link" href="{{ url_for('bilibili.select_mode') }}"
