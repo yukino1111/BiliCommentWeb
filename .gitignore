@@ -15,7 +15,8 @@ venv/
 ENV/
 .conda/
 bili_cookie.txt
+bili_cookie1.txt
+bili_data.db
 *.csv
 ./flaskstarter/assets/chrome_user_data/
-./flaskstarter/static/image/
-/flaskstarter/static/image
+/flaskstarter/static/images

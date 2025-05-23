@@ -306,20 +306,40 @@
           onerror="this.onerror=null; this.src='/static/img/chart_error.png'; this.alt='图表加载失败'"
         />
   </section>
-
+  <!-- Two-column charts row -->
+  <div class="row chart-row">
   <!-- VIP Status -->
-  <section class="chart-section" data-chart-id="vip-status">
-    <h2 class="chart-title"><i class="bi bi-gem"></i>用户大会员状态分布</h2>
-    <div class="chart-content">
-      <div class="chart-img-container">
-        <img
-          src="{{ static_path + chart_files.vip_status }}"
-          class="chart-img"
-          alt="大会员状态"
-          onerror="this.onerror=null; this.src='/static/img/chart_error.png'; this.alt='图表加载失败'"
-        />
-  </section>
+    <div class="col-md-6">
+      <section class="chart-section" data-chart-id="vip-status">
+        <h2 class="chart-title"><i class="bi bi-gem"></i>用户大会员状态分布</h2>
+        <div class="chart-content">
+          <div class="chart-img-container">
+            <img
+              src="{{ static_path + chart_files.vip_status }}"
+              class="chart-img"
+              alt="大会员状态"
+              onerror="this.onerror=null; this.src='/static/img/chart_error.png'; this.alt='图表加载失败'"
+            />
+      </section>
+    </div>
 
+    <!-- Comment Radar -->
+    <div class="col-md-6">
+      <section class="chart-section" data-chart-id="comment-comparison">
+        <h2 class="chart-title">
+          <i class="bi bi-pie-chart"></i>评论雷达图
+        </h2>
+        <div class="chart-content">
+          <div class="chart-img-container">
+            <img
+              src="{{ static_path + chart_files.comment_comparison }}"
+              class="chart-img"
+              alt="评论对比"
+              onerror="this.onerror=null; this.src='/static/img/chart_error.png'; this.alt='图表加载失败'"
+            />
+      </section>
+    </div>
+  </div>
   <!-- Two-column charts row -->
   <div class="row chart-row">
     <!-- Gender Distribution -->
