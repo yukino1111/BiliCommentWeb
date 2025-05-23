@@ -155,14 +155,13 @@ def get_comment_details(oid: str, type: int, seek_rpid: str) -> dict:
         return {"success": False, "message": f"发生错误: {str(e)}"}
 
 
-def generate_bilibili_comment_links(
+def generate_links(
     rpid,
-    rootid,
     oid,
     type,
 ):
     link1 = ""
-    link2 = f"https://www.bilibili.com/h5/comment/sub?oid={oid}&pageType={type}&root={rootid}"
+    link2 = f"https://www.bilibili.com/h5/comment/sub?oid={oid}&pageType={type}&root={rpid}"
     if type == 11:
         link1 = f"https://t.bilibili.com/{oid}?type=2#reply{rpid}"
     elif type == 14:

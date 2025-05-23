@@ -12,6 +12,8 @@ from flask import (
 from flask_login import login_required
 import io
 import os
+
+from flaskstarter.tools.get_link_and_details import generate_links
 from .forms import BVCrawlerForm, UIDCrawlerForm, ModeSelectForm
 import pandas as pd
 
@@ -162,6 +164,7 @@ def upload_file(name):
     """处理爬取完成后的操作选择页面"""
     try:
         import os
+
         if not os.path.exists(OUTPUT_CSV_PATH):
             flash("评论文件不存在", "danger")
             return redirect(url_for("bilibili.select_mode"))
@@ -169,15 +172,51 @@ def upload_file(name):
         file_size = os.path.getsize(OUTPUT_CSV_PATH) / 1024  # KB
         df = pd.read_csv(OUTPUT_CSV_PATH, encoding="utf-8")
         data_records_count = len(df)
+        # 添加分页逻辑
+        page = request.args.get("page", 1, type=int)
+        per_page = 10
+        total_pages = (data_records_count + per_page - 1) // per_page  # 向上取整
+
+        # 计算当前页的数据
+        start_idx = (page - 1) * per_page
+        end_idx = min(start_idx + per_page, data_records_count)
+
+        # 获取当前页的数据
+        current_data = df.iloc[start_idx:end_idx]
+
+        # 确定数据类型 (uid模式显示的列较少)
+        is_uid = name == "uid"
+
+        # 为每条评论生成链接
+        comments = []
+        for _, row in current_data.iterrows():
+            comment_data = row.to_dict()
+            rpid = int(comment_data.get("评论ID", 0))
+            oid = int(comment_data.get("oid", 0))
+            type = int(comment_data.get("type", 0))
+
+            user_link, comment_link = generate_links(
+                rpid,
+                oid,
+                type,
+            )
+            comment_data["user_link"] = user_link
+            comment_data["comment_link"] = comment_link
+            comments.append(comment_data)
 
         return render_template(
             "bilibili/upload_success.html",
             name=name,
             file_info={
                 "size": round(file_size, 2),
-                "line_count": data_records_count, 
+                "line_count": data_records_count,
             },
+            comments=comments,
+            is_uid=is_uid,
+            page=page,
+            total_pages=total_pages,
         )
+
     except Exception as e:
         flash(f"处理失败: {str(e)}", "danger")
         return redirect(url_for("bilibili.select_mode"))
