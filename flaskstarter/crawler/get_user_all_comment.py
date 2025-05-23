@@ -13,7 +13,7 @@ class BilibiliUserCommentsCrawler:
         self.base_url = "https://api.aicu.cc/api/v3/search/getreply"
         self.comment_repo = CommentRepository(db_name)
         self.crawled_comment_count = 0
-        self.page_size = 100  # 每页评论数量
+        self.page_size = 500  # 每页评论数量
 
     def _get_comments_page_from_api(
         self, uid: str, pn: int

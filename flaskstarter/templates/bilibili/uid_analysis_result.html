@@ -267,7 +267,7 @@
       {% endif %}
     </div> -->
     <h1>
-      {% if is_bv %} 视频评论分析结果 {% else %} UP主评论分析结果 {% endif %}
+      个人评论分析结果
     </h1>
     <p class="text-muted">{{ name }}</p>
   </header>
@@ -275,15 +275,11 @@
   <!-- Basic stats box -->
   <div class="stats-box">
     <div class="row">
-      <div class="col-md-4 stat-item">
+      <div class="col-md-6 stat-item">
         <div class="stat-value">{{ stats.total_comments }}</div>
         <div class="stat-label">总评论数</div>
       </div>
-      <div class="col-md-4 stat-item">
-        <div class="stat-value">{{ stats.unique_users }}</div>
-        <div class="stat-label">独立用户数</div>
-      </div>
-      <div class="col-md-4 stat-item">
+      <div class="col-md-6 stat-item">
         <div class="stat-value">{{ stats.file_size|round(2) }} KB</div>
         <div class="stat-label">文件大小</div>
       </div>
@@ -291,91 +287,6 @@
   </div>
 
   <!-- Chart sections -->
-
-  <!-- IP Distribution -->
-  <section class="chart-section" data-chart-id="ip-distribution">
-    <h2 class="chart-title">
-      <i class="bi bi-geo-alt"></i>用户IP属地 Top 10 分布
-    </h2>
-    <div class="chart-content">
-      <div class="chart-img-container">
-        <img
-          src="{{ static_path + chart_files.ip_distribution }}"
-          class="chart-img"
-          alt="IP属地分布"
-          onerror="this.onerror=null; this.src='/static/img/chart_error.png'; this.alt='图表加载失败'"
-        />
-  </section>
-  <!-- Two-column charts row -->
-  <div class="row chart-row">
-  <!-- VIP Status -->
-    <div class="col-md-6">
-      <section class="chart-section" data-chart-id="vip-status">
-        <h2 class="chart-title"><i class="bi bi-gem"></i>用户大会员状态分布</h2>
-        <div class="chart-content">
-          <div class="chart-img-container">
-            <img
-              src="{{ static_path + chart_files.vip_status }}"
-              class="chart-img"
-              alt="大会员状态"
-              onerror="this.onerror=null; this.src='/static/img/chart_error.png'; this.alt='图表加载失败'"
-            />
-      </section>
-    </div>
-
-    <!-- Comment Radar -->
-    <div class="col-md-6">
-      <section class="chart-section" data-chart-id="comment-comparison">
-        <h2 class="chart-title">
-          <i class="bi bi-pie-chart"></i>评论雷达图
-        </h2>
-        <div class="chart-content">
-          <div class="chart-img-container">
-            <img
-              src="{{ static_path + chart_files.comment_comparison }}"
-              class="chart-img"
-              alt="评论对比"
-              onerror="this.onerror=null; this.src='/static/img/chart_error.png'; this.alt='图表加载失败'"
-            />
-      </section>
-    </div>
-  </div>
-  <!-- Two-column charts row -->
-  <div class="row chart-row">
-    <!-- Gender Distribution -->
-    <div class="col-md-6">
-      <section class="chart-section" data-chart-id="gender-distribution">
-        <h2 class="chart-title">
-          <i class="bi bi-gender-ambiguous"></i>用户性别分布
-        </h2>
-        <div class="chart-content">
-          <div class="chart-img-container">
-            <img
-              src="{{ static_path + chart_files.gender_distribution }}"
-              class="chart-img"
-              alt="性别分布"
-              onerror="this.onerror=null; this.src='/static/img/chart_error.png'; this.alt='图表加载失败'"
-            />
-      </section>
-    </div>
-
-    <!-- User Level -->
-    <div class="col-md-6">
-      <section class="chart-section" data-chart-id="level-distribution">
-        <h2 class="chart-title">
-          <i class="bi bi-bar-chart-steps"></i>用户等级分布
-        </h2>
-        <div class="chart-content">
-          <div class="chart-img-container">
-            <img
-              src="{{ static_path + chart_files.level_distribution }}"
-              class="chart-img"
-              alt="用户等级"
-              onerror="this.onerror=null; this.src='/static/img/chart_error.png'; this.alt='图表加载失败'"
-            />
-      </section>
-    </div>
-  </div>
 
   <!-- Time Trend -->
   <section class="chart-section" data-chart-id="time-trend">

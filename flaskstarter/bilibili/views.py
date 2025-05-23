@@ -31,7 +31,11 @@ from ..tools.config import *
 import os
 from ..repository.comment_repository import CommentRepository
 from ..entity.comment import Comment
-from ..tools.get_csv import export_comments_by_mid_to_csv, export_comments_by_oid_to_csv
+from ..tools.get_csv import (
+    export_comments_by_mid_to_csv,
+    export_comments_by_oid_to_csv,
+    export_comments_by_oid_to_csv_mini,
+)
 from ..repository.bv_repository import BvRepository
 from ..tools import get_user_all_bv
 
@@ -82,9 +86,9 @@ def bv_crawler():
     return render_template("bilibili/bv_crawler.html", form=form)
 
 
-@bilibili.route("/uid_crawler", methods=["GET", "POST"])
+@bilibili.route("/up_crawler", methods=["GET", "POST"])
 @login_required
-def uid_crawler():
+def up_crawler():
     bv_repo = BvRepository(BILI_DB_PATH)
     form = UIDCrawlerForm()
     if form.validate_on_submit():
@@ -93,7 +97,7 @@ def uid_crawler():
             is_second = form.is_second.data
             if not uid:
                 flash("请输入UID", "warning")
-                return render_template("bilibili/uid_crawler.html", form=form)
+                return render_template("bilibili/up_crawler.html", form=form)
             # 获取UP主所有视频aid列表
             crawler = get_user_all_bv.GetInfo(uid, headless=True)
             video_ids = crawler.next_page()
@@ -103,7 +107,7 @@ def uid_crawler():
                 crawler.crawl()
             try:
                 video_oids = bv_repo.get_oids_by_bids(video_ids)
-                export_comments_by_oid_to_csv(
+                export_comments_by_oid_to_csv_mini(
                     output_filepath=OUTPUT_CSV_PATH,
                     oids=video_oids,
                     db_name=BILI_DB_PATH,
@@ -111,8 +115,42 @@ def uid_crawler():
             except Exception as e:
                 print(f"失败: {e}")
                 flash("爬取失败，请检查UID或稍后再试。", "danger")
-                return render_template("bilibili/uid_crawler.html", form=form)
+                return render_template("bilibili/up_crawler.html", form=form)
             return redirect(url_for("bilibili.upload_file", name="up"))
+        except Exception as e:
+            flash(f"发生错误: {str(e)}", "danger")
+    return render_template("bilibili/up_crawler.html", form=form)
+
+
+@bilibili.route("/uid_crawler", methods=["GET", "POST"])
+@login_required
+def uid_crawler():
+    form = UIDCrawlerForm()
+    if form.validate_on_submit():
+        try:
+            uid = form.uid.data
+            mids = []
+            mids.append(uid)  # 示例mid，可以替换为真实的B站用户mid
+            if not uid:
+                flash("请输入UID", "warning")
+                return render_template("bilibili/up_crawler.html", form=form)
+            crawler = BilibiliUserCrawler(db_name=BILI_DB_PATH)
+            for single_mid in mids:
+                crawler.crawl_user_info(single_mid)
+            crawler = BilibiliUserCommentsCrawler(db_name=BILI_DB_PATH)
+            for single_mid in mids:
+                crawler.crawl_user_all_comments(single_mid, delay_seconds=0.5)
+            try:
+                export_comments_by_mid_to_csv(
+                    output_filepath=OUTPUT_CSV_PATH,
+                    mids=mids,
+                    db_name=BILI_DB_PATH,
+                )
+            except Exception as e:
+                print(f"失败: {e}")
+                flash("爬取失败，请检查UID或稍后再试。", "danger")
+                return render_template("bilibili/uid_crawler.html", form=form)
+            return redirect(url_for("bilibili.upload_file", name="uid"))
         except Exception as e:
             flash(f"发生错误: {str(e)}", "danger")
     return render_template("bilibili/uid_crawler.html", form=form)
@@ -195,7 +233,7 @@ def analyze_file(name):
             }
             # 渲染分析结果页面
             return render_template(
-                "bilibili/analysis_result.html",
+                "bilibili/comment_analysis_result.html",
                 name=name,
                 stats=stats,
                 chart_files=chart_files,
@@ -203,6 +241,30 @@ def analyze_file(name):
             )
         elif name == "uid":
             analyzer.run_mini_analysis()
+            chart_files = {
+                "time_trend": "comment_time_trend.png",
+                "hour_distribution": "comment_hour_distribution.png",
+                "sentiment": "comment_sentiment_distribution.png",
+                "wordcloud": "comment_wordcloud.png",
+            }
+            # 统计基本数据
+            stats = {
+                "total_comments": len(analyzer.df),
+                "unique_users": (
+                    len(analyzer.df_unique_users)
+                    if analyzer.df_unique_users is not None
+                    else 0
+                ),
+                "file_size": os.path.getsize(OUTPUT_CSV_PATH) / 1024,  # KB
+            }
+            # 渲染分析结果页面
+            return render_template(
+                "bilibili/uid_analysis_result.html",
+                name=name,
+                stats=stats,
+                chart_files=chart_files,
+                static_path=STATIC_IMAGE_DIR,
+            )
 
     except Exception as e:
         flash(f"分析失败: {str(e)}", "danger")

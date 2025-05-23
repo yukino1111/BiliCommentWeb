@@ -19,11 +19,18 @@
           class="card-header bg-gradient-primary text-white text-center py-3"
         >
           <h5 class="m-0">
-            <i class="bi bi-person-circle mr-2"></i>爬取用户评论（通过UID）
+            <i class="bi bi-person-circle mr-2"></i>爬取用户视频评论（通过UID）
           </h5>
         </div>
         <div class="card-body p-4">
-          <form method="POST" action="{{ url_for('bilibili.uid_crawler') }}">
+          <!-- <div class="alert alert-info"> -->
+            <!-- <small
+              ><i class="bi bi-info-circle"></i>
+              提示：请输入用户的UID，纯数字格式</small
+            > -->
+          <!-- </div> -->
+
+          <form method="POST" action="{{ url_for('bilibili.up_crawler') }}">
             {{ form.csrf_token }}
 
             <div class="form-group mb-4">
@@ -38,6 +45,14 @@
                 {% endfor %}
               </div>
               {% endif %}
+            </div>
+
+            <div class="form-check mb-4">
+              {{ form.is_second(class="form-check-input") }}
+              <label class="form-check-label" for="{{ form.is_second.id }}">
+                {{ form.is_second.label.text }}
+                <span class="badge bg-secondary text-white">推荐</span>
+              </label>
             </div>
 
             <div class="form-group d-flex justify-content-between mt-4">

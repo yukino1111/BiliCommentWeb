@@ -44,7 +44,8 @@ class ModeSelectForm(FlaskForm):
         "选择爬取模式",
         choices=[
             ("bv", "视频评论爬取（输入BV号）"),
-            ("uid", "用户评论爬取（输入UID）"),
+            ("up", "用户视频评论爬取（输入UID号）"),
+            ("uid", "用户评论爬取（输入UID号）"),
         ],
         default="bv",
         validators=[InputRequired()],
