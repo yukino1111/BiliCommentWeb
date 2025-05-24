@@ -4,7 +4,7 @@
 
 ### 评论爬取：
 
-支持 BV 号视频评论分析，UID 个人视频评论分析，UID 个人评论分析
+支持 BV 号视频评论，UID 个人视频评论，UID 个人评论
 
 ### 数据分析：
 
@@ -41,6 +41,13 @@
 ![Crawler](/screenshots/crawler.png)
 ![bv_upload_success](/screenshots/bv_upload_success.png)
 ![comment_analysis_result](/screenshots/comment_analysis_result.png)
+
+## 技术栈
+
+- 前端： HTML + CSS + JavaScript
+- 后端： Python + Flask
+- 数据存储： SQLite
+- 数据分析与可视化： Pandas + Matplotlib + Seaborn
 
 ## 致谢
 
