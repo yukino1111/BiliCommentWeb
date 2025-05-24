@@ -10,48 +10,63 @@
     rel="stylesheet"
     href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
   />
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
 </head>
 <div class="container mt-5 pt-5">
   <div class="row justify-content-center">
     {# 调整主内容区域的宽度，例如从 col-md-8 调整为 col-md-10 或 col-lg-9/10 #}
-    <div class="col-md-10 col-lg-9"> {# 尝试 col-md-10 或 col-lg-9，根据实际效果调整 #}
+    <div class="col-md-10 col-lg-9">
+      {# 尝试 col-md-10 或 col-lg-9，根据实际效果调整 #}
       <div class="card shadow-lg border-0 rounded-lg">
-        <div class="card-header bg-gradient-success text-white text-center py-4">
-          <h4 class="m-0"><i class="bi bi-check-circle-fill me-2"></i> 评论爬取成功</h4>
+        <div
+          class="card-header bg-gradient-success text-white text-center py-4"
+        >
+          <h4 class="m-0">
+            </i> 评论爬取成功
+          </h4>
         </div>
         <div class="card-body p-5 text-center">
           <div class="success-icon mb-4">
-            <i class="bi bi-check-circle text-success" style="font-size: 4rem;"></i>
+            <i
+              class="bi bi-check-circle text-success"
+              style="font-size: 4rem"
+            ></i>
           </div>
-          <h5 class="card-title font-weight-bold mb-4">
-            {% if is_bv %}
-              已成功爬取视频 <span class="text-primary">{{ name }}</span> 的评论
-            {% else %}
-              已成功爬取UP主 <span class="text-primary">{{ name }}</span> 的评论
-            {% endif %}
-          </h5>
           <div class="alert alert-info">
             <div class="row">
               <div class="col-md-6">
-                <p class="mb-1"><strong>评论数量:</strong> <span class="text-dark">{{ file_info.line_count }}</span> 条</p>
+                <p class="mb-1">
+                  <strong>评论数量:</strong>
+                  <span class="text-dark">{{ file_info.line_count }}</span> 条
+                </p>
               </div>
               <div class="col-md-6">
-                <p class="mb-1"><strong>文件大小:</strong> <span class="text-dark">{{ file_info.size }}</span> KB</p>
+                <p class="mb-1">
+                  <strong>文件大小:</strong>
+                  <span class="text-dark">{{ file_info.size }}</span> KB
+                </p>
               </div>
             </div>
           </div>
           <div class="mt-5">
             <p class="mb-4">你可以选择下载评论数据或对评论进行分析:</p>
-            <a href="{{ url_for('bilibili.download_file', name=name) }}" class="btn btn-primary btn-lg px-4 me-3">
+            <a
+              href="{{ url_for('bilibili.download_file', name=name) }}"
+              class="btn btn-primary btn-lg px-4 me-3"
+            >
               <i class="bi bi-download me-2"></i> 下载评论
             </a>
-            <a href="{{ url_for('bilibili.analyze_file', name=name) }}" class="btn btn-info btn-lg px-4">
-              <i class="bi bi-graph-up me-2"></i> 分析评论
+            <a
+              href="{{ url_for('bilibili.analyze_file', name=name) }}"
+              class="btn btn-info btn-lg px-4"
+            >
+              <i class="bi bi-graph-up me-2"></i> 分析结果
             </a>
           </div>
           <div class="mt-5">
-            <a href="{{ url_for('bilibili.select_mode') }}" class="btn btn-outline-secondary">
+            <a
+              href="{{ url_for('bilibili.select_mode') }}"
+              class="btn btn-outline-secondary"
+            >
               <i class="bi bi-arrow-left me-2"></i> 返回首页
             </a>
           </div>
@@ -62,10 +77,14 @@
   {# 评论预览表格部分，可以考虑让它占据更宽的区域，甚至使用 container-fluid #}
   {# 如果希望表格也居中且有边距，可以放在一个 col-xx-xx 内部 #}
   <div class="row justify-content-center mt-5">
-    <div class="col-12"> {# 让表格占据整个 container 的宽度 #}
+    <div class="col-12">
+      {# 让表格占据整个 container 的宽度 #}
       <h5 class="card-title font-weight-bold mb-3">评论预览</h5>
       <div class="table-responsive">
-        <table class="table table-hover table-bordered align-middle comment-table"> {# 添加 comment-table 类 #}
+        <table
+          class="table table-hover table-bordered align-middle comment-table"
+        >
+          {# 添加 comment-table 类 #}
           <thead class="table-light">
             <tr>
               <th scope="col">#</th>
@@ -81,6 +100,7 @@
               {% if not is_uid %}
               <th scope="col">回复数</th>
               <th scope="col">点赞数</th>
+              <th scope="col">IP属地</th>
               {% endif %}
               <th scope="col">链接</th>
             </tr>
@@ -96,23 +116,44 @@
               <td>{{ comment.get('用户等级', comment.get('level', '')) }}</td>
               <td>{{ comment.get('性别', comment.get('sex', '')) }}</td>
               {% endif %}
-              <td class="comment-content-cell">{{ comment.get('评论内容', comment.get('information', ''))|truncate(80) }}</td> {# 增加 truncate 长度 #}
+              <td class="comment-content-cell">
+                {{ comment.get('评论内容', comment.get('information',
+                ''))|truncate(80) }}
+              </td>
+              {# 增加 truncate 长度 #}
               <td>{{ comment.get('评论时间', comment.get('time', '')) }}</td>
               {% if not is_uid %}
-              <td>{{ comment.get('回复数', comment.get('single_reply_num', '')) }}</td>
-              <td>{{ comment.get('点赞数', comment.get('single_like_num', '')) }}</td>
+              <td>
+                {{ comment.get('回复数', comment.get('single_reply_num', '')) }}
+              </td>
+              <td>
+                {{ comment.get('点赞数', comment.get('single_like_num', '')) }}
+              </td>
+              <td>
+                {{ comment.get('IP属地', comment.get('iplocation', '')) }}
+              </td>
               {% endif %}
               <td>
-                {# 使用 d-grid 和 gap-2 来创建垂直堆叠的按钮，并添加 w-100 使按钮宽度填充单元格 #}
+                {# 使用 d-grid 和 gap-2 来创建垂直堆叠的按钮，并添加 w-100
+                使按钮宽度填充单元格 #}
                 <div class="d-grid gap-2">
                   {% if comment.get('user_link', '') %}
-                  <a href="{{ comment['user_link'] }}" class="btn btn-sm btn-outline-primary w-100" target="_blank" title="用户主页链接">
-                    <i class="bi bi-person me-1"></i> 用户主页
+                  <a
+                    href="{{ comment['user_link'] }}"
+                    class="btn btn-sm btn-outline-primary w-100"
+                    target="_blank"
+                    title="链接一"
+                  >
+                    <i class="bi bi-person me-1"></i> 链接一
                   </a>
-                  {% endif %}
-                  {% if comment.get('comment_link', '') %}
-                  <a href="{{ comment['comment_link'] }}" class="btn btn-sm btn-outline-info w-100" target="_blank" title="评论详情链接">
-                    <i class="bi bi-chat-dots me-1"></i> 评论详情
+                  {% endif %} {% if comment.get('comment_link', '') %}
+                  <a
+                    href="{{ comment['comment_link'] }}"
+                    class="btn btn-sm btn-outline-info w-100"
+                    target="_blank"
+                    title="链接二"
+                  >
+                    <i class="bi bi-chat-dots me-1"></i> 链接二
                   </a>
                   {% endif %}
                 </div>
@@ -127,21 +168,34 @@
       <nav aria-label="Page navigation">
         <ul class="pagination justify-content-center">
           <li class="page-item {% if page == 1 %}disabled{% endif %}">
-            <a class="page-link" href="{{ url_for('bilibili.upload_file', name=name, page=page-1) if page > 1 else '#' }}">
+            <a
+              class="page-link"
+              href="{{ url_for('bilibili.upload_file', name=name, page=page-1) if page > 1 else '#' }}"
+            >
               <span aria-hidden="true">&laquo;</span>
             </a>
           </li>
-          {% for i in range(1, total_pages + 1) %}
-            {% if i == page %}
-            <li class="page-item active"><span class="page-link">{{ i }}</span></li>
-            {% elif i <= 3 or i >= total_pages - 2 or (i >= page - 1 and i <= page + 1) %}
-            <li class="page-item"><a class="page-link" href="{{ url_for('bilibili.upload_file', name=name, page=i) }}">{{ i }}</a></li>
-            {% elif i == 4 or i == total_pages - 3 %}
-            <li class="page-item disabled"><span class="page-link">...</span></li>
-            {% endif %}
-          {% endfor %}
+          {% for i in range(1, total_pages + 1) %} {% if i == page %}
+          <li class="page-item active">
+            <span class="page-link">{{ i }}</span>
+          </li>
+          {% elif i <= 3 or i >= total_pages - 2 or (i >= page - 1 and i <= page
+          + 1) %}
+          <li class="page-item">
+            <a
+              class="page-link"
+              href="{{ url_for('bilibili.upload_file', name=name, page=i) }}"
+              >{{ i }}</a
+            >
+          </li>
+          {% elif i == 4 or i == total_pages - 3 %}
+          <li class="page-item disabled"><span class="page-link">...</span></li>
+          {% endif %} {% endfor %}
           <li class="page-item {% if page == total_pages %}disabled{% endif %}">
-            <a class="page-link" href="{{ url_for('bilibili.upload_file', name=name, page=page+1) if page < total_pages else '#' }}">
+            <a
+              class="page-link"
+              href="{{ url_for('bilibili.upload_file', name=name, page=page+1) if page < total_pages else '#' }}"
+            >
               <span aria-hidden="true">&raquo;</span>
             </a>
           </li>
@@ -178,7 +232,7 @@
   .comment-table th,
   .comment-table td {
     white-space: nowrap; /* 默认不换行，让内容尽可能在一行显示 */
-    overflow: hidden;     /* 隐藏超出部分 */
+    overflow: hidden; /* 隐藏超出部分 */
     text-overflow: ellipsis; /* 超出部分显示省略号 */
   }
 
@@ -216,7 +270,8 @@
   /* {% endif %} */
 
   .comment-table th:nth-child(7), /* 评论内容 列 (如果 is_uid 为 false，这是第7列) */
-  .comment-table td.comment-content-cell { /* 使用类名更精确地定位评论内容列 */
+  .comment-table td.comment-content-cell {
+    /* 使用类名更精确地定位评论内容列 */
     white-space: normal; /* 允许评论内容换行 */
     min-width: 250px; /* 评论内容列的最小宽度 */
     max-width: 400px; /* 评论内容列的最大宽度，防止过宽 */
@@ -237,6 +292,11 @@
   }
   .comment-table th:nth-child(10), /* 点赞数 列 */
   .comment-table td:nth-child(10) {
+    width: 7%;
+    min-width: 70px;
+  }
+  .comment-table th:nth-child(11), 
+  .comment-table td:nth-child(11) {
     width: 7%;
     min-width: 70px;
   }

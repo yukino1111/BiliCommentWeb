@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from flask import (
     Blueprint,
     render_template,
@@ -17,29 +15,21 @@ from flaskstarter.tools.get_link_and_details import generate_links
 from .forms import BVCrawlerForm, UIDCrawlerForm, ModeSelectForm
 import pandas as pd
 
-# from .crawler import BilibiliCrawler
-
-
-from ..entity.comment import Comment
 
 from ..analyzer.analyze_comment import CommentAnalyzer
 from ..crawler.get_single_video_comment import BilibiliCommentCrawler
 from ..crawler.get_user_all_comment import BilibiliUserCommentsCrawler
 from ..crawler.get_user_information import BilibiliUserCrawler
 from ..database.db_manage import init_bilibili_db
-from ..entity.user import User
-from ..repository.user_repository import UserRepository
 from ..tools.config import *
-import os
 from ..repository.comment_repository import CommentRepository
-from ..entity.comment import Comment
 from ..tools.get_csv import (
-    export_comments_by_mid_to_csv,
     export_comments_by_oid_to_csv,
-    export_comments_by_oid_to_csv_mini,
+    export_comments_by_mid_to_csv_mini,
 )
 from ..repository.bv_repository import BvRepository
 from ..tools import get_user_all_bv
+import requests
 
 bilibili = Blueprint("bilibili", __name__, url_prefix="/bilibili")
 
@@ -109,7 +99,7 @@ def up_crawler():
                 crawler.crawl()
             try:
                 video_oids = bv_repo.get_oids_by_bids(video_ids)
-                export_comments_by_oid_to_csv_mini(
+                export_comments_by_oid_to_csv(
                     output_filepath=OUTPUT_CSV_PATH,
                     oids=video_oids,
                     db_name=BILI_DB_PATH,
@@ -143,7 +133,7 @@ def uid_crawler():
             for single_mid in mids:
                 crawler.crawl_user_all_comments(single_mid, delay_seconds=0.5)
             try:
-                export_comments_by_mid_to_csv(
+                export_comments_by_mid_to_csv_mini(
                     output_filepath=OUTPUT_CSV_PATH,
                     mids=mids,
                     db_name=BILI_DB_PATH,
@@ -286,6 +276,40 @@ def analyze_file(name):
                 "sentiment": "comment_sentiment_distribution.png",
                 "wordcloud": "comment_wordcloud.png",
             }
+            user_mid = None
+            if analyzer.df is not None and not analyzer.df.empty:
+                user_mid = (
+                    int(analyzer.df["用户ID"].iloc[0])
+                    if "用户ID" in analyzer.df.columns
+                    else None
+                )
+            # 获取用户最新评论信息
+            user_detail = None
+            if user_mid:
+                comment_repo = CommentRepository(db_name=BILI_DB_PATH)
+                # 获取用户最新的评论
+                latest_comment = comment_repo.get_latest_comment_by_mid(user_mid)
+                if latest_comment:
+                    # 调用get_comment_details获取详细信息
+                    from ..tools.get_link_and_details import get_comment_details
+
+                    user_detail = get_comment_details(
+                        latest_comment["oid"],
+                        latest_comment["type"],
+                        latest_comment["rpid"],
+                    )
+            try:
+                response = requests.get(
+                    user_detail["comment_info"]["face"], stream=True
+                )
+                response.raise_for_status()
+                print(USER_FACE_PATH)
+                with open(USER_FACE_PATH, "wb") as file:
+                    for chunk in response.iter_content(chunk_size=8192):
+                        file.write(chunk)
+                user_detail["comment_info"]["face"] = USER_FACE_NAME
+            except requests.exceptions.RequestException as e:
+                user_detail["comment_info"]["face"] = ORIGIN_FACE_NAME
             # 统计基本数据
             stats = {
                 "total_comments": len(analyzer.df),
@@ -296,6 +320,7 @@ def analyze_file(name):
                 ),
                 "file_size": os.path.getsize(OUTPUT_CSV_PATH) / 1024,  # KB
             }
+            print(f"userdata{user_detail}")
             # 渲染分析结果页面
             return render_template(
                 "bilibili/uid_analysis_result.html",
@@ -303,6 +328,7 @@ def analyze_file(name):
                 stats=stats,
                 chart_files=chart_files,
                 static_path=STATIC_IMAGE_DIR,
+                user_detail=user_detail,
             )
 
     except Exception as e:

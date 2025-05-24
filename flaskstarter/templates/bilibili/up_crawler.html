@@ -23,13 +23,6 @@
           </h5>
         </div>
         <div class="card-body p-4">
-          <!-- <div class="alert alert-info"> -->
-            <!-- <small
-              ><i class="bi bi-info-circle"></i>
-              提示：请输入用户的UID，纯数字格式</small
-            > -->
-          <!-- </div> -->
-
           <form method="POST" action="{{ url_for('bilibili.up_crawler') }}">
             {{ form.csrf_token }}
 

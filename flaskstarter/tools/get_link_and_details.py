@@ -6,7 +6,7 @@ import urllib.parse
 from ..tools.config import COOKIE_PATH
 
 
-def get_comment_details(oid: str, type: int, seek_rpid: str) -> dict:
+def get_comment_details(oid: int, type: int, seek_rpid: int) -> dict:
     # 固定参数
     mode = 3
     plat = 1
@@ -117,9 +117,6 @@ def get_comment_details(oid: str, type: int, seek_rpid: str) -> dict:
         result = {
             "success": True,
             "comment_info": {
-                "rpid": comment_found["rpid"],
-                "oid": oid,
-                "type": comment_found["type"],
                 "mid": member_info["mid"],
                 "name": member_info["uname"],
                 "sex": member_info["sex"],
@@ -128,22 +125,8 @@ def get_comment_details(oid: str, type: int, seek_rpid: str) -> dict:
                 "face": member_info["avatar"],
                 "sign": member_info.get("sign", ""),
                 "ip_location": ip_location,
-                "content": comment_found["content"]["message"],
-                "like_num": comment_found["like"],
-                "time": comment_found["ctime"],
-                "reply_num": 0,  # 默认为0
             },
         }
-
-        # 获取回复数
-        rereply_text = comment_found.get("reply_control", {}).get(
-            "sub_reply_entry_text"
-        )
-        if rereply_text:
-            import re
-
-            match = re.findall(r"\d+", rereply_text)
-            result["comment_info"]["reply_num"] = int(match[0]) if match else 0
 
         return result
 

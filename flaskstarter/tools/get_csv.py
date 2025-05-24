@@ -85,6 +85,73 @@ def export_comments_by_mid_to_csv(
         print(f"导出评论到 CSV 失败: {e}")
 
 
+def export_comments_by_mid_to_csv_mini(
+    output_filepath: str, mids: List[int], db_name: str = "./assets/bili_data.db"
+):
+    if not mids:
+        print(
+            "Warning: No mids provided for export. CSV file will be empty (header only if created)."
+        )
+        return
+
+    repo = CommentRepository(db_name)
+    comments_iterator = repo.get_comments_by_mid_stream(mids)
+
+    # 确保输出目录存在
+    output_dir = os.path.dirname(output_filepath)
+    if output_dir and not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
+    try:
+        with open(output_filepath, "w", newline="", encoding="utf-8-sig") as csvfile:
+            csv_writer = csv.writer(csvfile)
+
+            # 写入 CSV 表头
+            header = [
+                "序号",
+                "评论ID",
+                "用户ID",
+                "评论内容",
+                "评论时间",
+                "parentid",
+                "rootid",
+                "oid",
+                "type",
+            ]
+            csv_writer.writerow(header)
+
+            row_number = 0
+            for comment in comments_iterator:
+                row_number += 1
+                try:
+                    # 将 Unix 时间戳转换为易读的日期时间格式
+                    import datetime
+
+                    comment_time_str = datetime.datetime.fromtimestamp(
+                        comment.time
+                    ).strftime("%Y-%m-%d %H:%M:%S")
+                except (TypeError, ValueError):
+                    comment_time_str = str(comment.time)  # 转换失败则保留原样
+
+                row_data = [
+                    row_number,
+                    comment.rpid,
+                    comment.mid,
+                    comment.information,
+                    comment_time_str,
+                    comment.parentid,
+                    comment.rootid,
+                    comment.oid,
+                    comment.type,
+                ]
+                csv_writer.writerow(row_data)
+        print(
+            f"评论已成功导出到: {output_filepath} (根据 mid: {mids})，共 {row_number} 条记录。"
+        )
+    except Exception as e:
+        print(f"导出评论到 CSV 失败: {e}")
+
+
 def export_comments_by_oid_to_csv(
     output_filepath: str, oids: List[int], db_name: str = "bilibili_comments.db"
 ):
@@ -158,70 +225,6 @@ def export_comments_by_oid_to_csv(
                     comment.ip_location,
                     vip_status,
                     comment.face,
-                    comment.parentid,
-                    comment.rootid,
-                    comment.oid,
-                    comment.type,
-                ]
-                csv_writer.writerow(row_data)
-        print(
-            f"评论已成功导出到: {output_filepath} (根据 oid: {oids})，共 {row_number} 条记录。"
-        )
-    except Exception as e:
-        print(f"导出评论到 CSV 失败: {e}")
-
-
-def export_comments_by_oid_to_csv_mini(
-    output_filepath: str, oids: List[int], db_name: str = "bilibili_comments.db"
-):
-    if not oids:
-        print(
-            "Warning: No oids provided for export. CSV file will be empty (header only if created)."
-        )
-        return
-
-    repo = CommentRepository(db_name)
-    comments_iterator = repo.get_comments_by_oid_stream(oids)  # 使用 oid 的流式查询
-
-    # 确保输出目录存在
-    output_dir = os.path.dirname(output_filepath)
-    if output_dir and not os.path.exists(output_dir):
-        os.makedirs(output_dir)
-
-    try:
-        with open(output_filepath, "w", newline="", encoding="utf-8-sig") as csvfile:
-            csv_writer = csv.writer(csvfile)
-
-            # 写入 CSV 表头 (与按 mid 导出相同)
-            header = [
-                "序号",
-                "评论ID",
-                "评论内容",
-                "评论时间",
-                "parentid",
-                "rootid",
-                "oid",
-                "type",
-            ]
-            csv_writer.writerow(header)
-
-            row_number = 0
-            for comment in comments_iterator:
-                row_number += 1
-                try:
-                    import datetime
-
-                    comment_time_str = datetime.datetime.fromtimestamp(
-                        comment.time
-                    ).strftime("%Y-%m-%d %H:%M:%S")
-                except (TypeError, ValueError):
-                    comment_time_str = str(comment.time)
-
-                row_data = [
-                    row_number,
-                    comment.rpid,
-                    comment.information,
-                    comment_time_str,
                     comment.parentid,
                     comment.rootid,
                     comment.oid,

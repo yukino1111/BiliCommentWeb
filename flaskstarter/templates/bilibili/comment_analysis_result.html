@@ -14,8 +14,6 @@
     rel="stylesheet"
     href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
   />
-  <!-- 引用你的自定义CSS文件 -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
 </head>
 <style>
   /* 通用样式 */
@@ -262,7 +260,7 @@
     <h1>
       {% if name=="bv" %} 视频评论分析结果 {% else %} UP主评论分析结果 {% endif %}
     </h1>
-    <p class="text-muted">{{ name }}</p>
+    <!-- <p class="text-muted">{{ name }}</p> -->
   </header>
 
   <!-- Basic stats box -->

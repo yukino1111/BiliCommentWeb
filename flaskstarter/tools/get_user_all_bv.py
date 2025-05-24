@@ -6,27 +6,21 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 import os
-
+from ..tools.config import *
 
 class GetInfo:
     def __init__(self, user_id, headless=True):
-        self.a_list = []  
-        relative_user_data_dir = os.path.join("./assets", "chrome_user_data")
-        self.user_data_dir = os.path.abspath(relative_user_data_dir)
+        self.a_list = []
         chrome_options = Options()
         if headless:
             chrome_options.add_argument("--headless")
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--disable-dev-shm-usage")
         chrome_options.add_argument("--disable-logging")
-        chrome_options.add_argument(
-            "--log-level=3"
-        ) 
-        chrome_options.add_experimental_option(
-            "excludeSwitches", ["enable-logging"]
-        )
+        chrome_options.add_argument("--log-level=3")
+        chrome_options.add_experimental_option("excludeSwitches", ["enable-logging"])
         self.d = webdriver.Chrome(
-            service=Service("./assets/chromedriver.exe"), options=chrome_options
+            service=Service(CHROME_DRIVER_PATH), options=chrome_options
         )
         self.user_id = user_id
         self.base_url = f"https://space.bilibili.com/{user_id}/video"

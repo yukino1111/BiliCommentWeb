@@ -309,3 +309,34 @@ class CommentRepository:
         finally:
             if conn:
                 conn.close()
+
+    def get_latest_comment_by_mid(self, mid: int) -> Optional[Comment]:
+        if not mid:
+            return None
+        conn = self._get_connection()
+        try:
+
+            conn.row_factory = sqlite3.Row
+            cursor = conn.cursor()
+            query_sql = """
+            SELECT rpid, oid, type FROM comment
+            WHERE mid = ?
+            ORDER BY time DESC
+            LIMIT 1
+            """
+            cursor.execute(query_sql, (mid,))
+            row = cursor.fetchone()
+            if row:
+                result_dict = {
+                    "rpid": row["rpid"],
+                    "oid": row["oid"],
+                    "type": row["type"],
+                }
+                return result_dict
+            return None
+        except sqlite3.Error as e:
+            print(f"获取用户最新评论失败: {e}")
+            return None
+        finally:
+            if conn:
+                conn.close()

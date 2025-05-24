@@ -76,6 +76,7 @@ class UserRepository:
         根据一个或多个用户ID (mid) 查询用户。
         返回 User 对象的列表。
         """
+
         if not mids:
             return []
         conn = self._get_connection()
