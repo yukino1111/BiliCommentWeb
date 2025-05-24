@@ -3,7 +3,9 @@
 from sqlalchemy.orm.mapper import configure_mappers
 
 from flaskstarter import create_app
+from flaskstarter.database.db_manage import init_bilibili_db
 from flaskstarter.extensions import db
+from flaskstarter.tools.config import BILI_DB_PATH
 from flaskstarter.user import Users, ADMIN, USER, ACTIVE
 
 from flaskstarter.utils import INSTANCE_FOLDER_PATH
@@ -14,7 +16,7 @@ application = create_app()
 @application.cli.command("initdb")
 def initdb():
     """Init/reset database."""
-    print(f"INSTANCE_FOLDER_PATH: " + INSTANCE_FOLDER_PATH)
+    # print(f"INSTANCE_FOLDER_PATH: " + INSTANCE_FOLDER_PATH)
     db.drop_all()
     configure_mappers()
     db.create_all()
@@ -38,3 +40,4 @@ def initdb():
     db.session.commit()
 
     print("Database initialized with 2 users (admin, demo)")
+    init_bilibili_db(BILI_DB_PATH)

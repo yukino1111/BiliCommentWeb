@@ -9,7 +9,6 @@ def init_bilibili_db(db_name):
         conn = sqlite3.connect(db_name)
         cursor = conn.cursor()
 
-        # 创建 user 表
         create_user_table_sql = """
         CREATE TABLE IF NOT EXISTS user (
             mid INTEGER PRIMARY KEY,  -- 用户ID，唯一标识，主键
@@ -26,7 +25,6 @@ def init_bilibili_db(db_name):
         cursor.execute(create_user_table_sql)
         print("表 'user' 创建成功或已存在。")
 
-        # 创建 comment 表
         create_comment_table_sql = """
         CREATE TABLE IF NOT EXISTS comment (
             rpid INTEGER PRIMARY KEY,           -- 评论ID，唯一标识，主键
@@ -51,7 +49,6 @@ def init_bilibili_db(db_name):
         cursor.execute(create_comment_table_sql)
         print("表 'comment' 创建成功或已存在。")
 
-        # 创建 bv 表
         create_bv_table_sql = """
         CREATE TABLE IF NOT EXISTS bv (
             oid INTEGER PRIMARY KEY,  -- 视频ID，唯一标识，主键

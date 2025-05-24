@@ -8,7 +8,6 @@ from flask import (
     request,
 )
 from flask_login import login_required
-import io
 import os
 
 from flaskstarter.tools.get_link_and_details import generate_links
@@ -30,6 +29,7 @@ from ..tools.get_csv import (
 from ..repository.bv_repository import BvRepository
 from ..tools import get_user_all_bv
 import requests
+from ..tools.get_link_and_details import get_comment_details
 
 bilibili = Blueprint("bilibili", __name__, url_prefix="/bilibili")
 
@@ -37,7 +37,22 @@ bilibili = Blueprint("bilibili", __name__, url_prefix="/bilibili")
 @bilibili.route("/select_mode", methods=["GET", "POST"])
 @login_required
 def select_mode():
-    init_bilibili_db(BILI_DB_PATH)
+    for filename in os.listdir(IMAGE_DIR):
+        if filename == ORIGIN_FACE_NAME:
+            continue
+        file_path = os.path.join(IMAGE_DIR, filename)
+        if os.path.isfile(file_path):
+            try:
+                os.remove(file_path)
+            except OSError as e:
+                print(f"  错误：无法删除文件 '{filename}': {e}")
+
+    if os.path.isfile(OUTPUT_CSV_PATH):
+        try:
+            os.remove(OUTPUT_CSV_PATH)
+        except OSError as e:
+            print(f"  错误：无法删除文件 '{filename}': {e}")
+
     form = ModeSelectForm()
     if form.validate_on_submit():
         mode = form.mode.data
@@ -90,7 +105,6 @@ def up_crawler():
             if not uid:
                 flash("请输入UID", "warning")
                 return render_template("bilibili/up_crawler.html", form=form)
-            # 获取UP主所有视频aid列表
             crawler = get_user_all_bv.GetInfo(uid, headless=True)
             video_ids = crawler.next_page()
             print(f"共获取到 {len(video_ids)} 个视频，开始批量爬取评论...")
@@ -122,7 +136,7 @@ def uid_crawler():
         try:
             uid = form.uid.data
             mids = []
-            mids.append(uid)  # 示例mid，可以替换为真实的B站用户mid
+            mids.append(uid)
             if not uid:
                 flash("请输入UID", "warning")
                 return render_template("bilibili/up_crawler.html", form=form)
@@ -153,31 +167,20 @@ def uid_crawler():
 def upload_file(name):
     """处理爬取完成后的操作选择页面"""
     try:
-        import os
-
         if not os.path.exists(OUTPUT_CSV_PATH):
             flash("评论文件不存在", "danger")
             return redirect(url_for("bilibili.select_mode"))
 
-        file_size = os.path.getsize(OUTPUT_CSV_PATH) / 1024  # KB
+        file_size = os.path.getsize(OUTPUT_CSV_PATH) / 1024
         df = pd.read_csv(OUTPUT_CSV_PATH, encoding="utf-8")
         data_records_count = len(df)
-        # 添加分页逻辑
         page = request.args.get("page", 1, type=int)
         per_page = 10
-        total_pages = (data_records_count + per_page - 1) // per_page  # 向上取整
-
-        # 计算当前页的数据
+        total_pages = (data_records_count + per_page - 1) // per_page
         start_idx = (page - 1) * per_page
         end_idx = min(start_idx + per_page, data_records_count)
-
-        # 获取当前页的数据
         current_data = df.iloc[start_idx:end_idx]
-
-        # 确定数据类型 (uid模式显示的列较少)
         is_uid = name == "uid"
-
-        # 为每条评论生成链接
         comments = []
         for _, row in current_data.iterrows():
             comment_data = row.to_dict()
@@ -250,7 +253,6 @@ def analyze_file(name):
                 "sentiment": "comment_sentiment_distribution.png",
                 "wordcloud": "comment_wordcloud.png",
             }
-            # 统计基本数据
             stats = {
                 "total_comments": len(analyzer.df),
                 "unique_users": (
@@ -258,9 +260,8 @@ def analyze_file(name):
                     if analyzer.df_unique_users is not None
                     else 0
                 ),
-                "file_size": os.path.getsize(OUTPUT_CSV_PATH) / 1024,  # KB
+                "file_size": os.path.getsize(OUTPUT_CSV_PATH) / 1024,
             }
-            # 渲染分析结果页面
             return render_template(
                 "bilibili/comment_analysis_result.html",
                 name=name,
@@ -283,16 +284,11 @@ def analyze_file(name):
                     if "用户ID" in analyzer.df.columns
                     else None
                 )
-            # 获取用户最新评论信息
             user_detail = None
             if user_mid:
                 comment_repo = CommentRepository(db_name=BILI_DB_PATH)
-                # 获取用户最新的评论
                 latest_comment = comment_repo.get_latest_comment_by_mid(user_mid)
                 if latest_comment:
-                    # 调用get_comment_details获取详细信息
-                    from ..tools.get_link_and_details import get_comment_details
-
                     user_detail = get_comment_details(
                         latest_comment["oid"],
                         latest_comment["type"],
@@ -310,7 +306,6 @@ def analyze_file(name):
                 user_detail["comment_info"]["face"] = USER_FACE_NAME
             except requests.exceptions.RequestException as e:
                 user_detail["comment_info"]["face"] = ORIGIN_FACE_NAME
-            # 统计基本数据
             stats = {
                 "total_comments": len(analyzer.df),
                 "unique_users": (
@@ -318,10 +313,9 @@ def analyze_file(name):
                     if analyzer.df_unique_users is not None
                     else 0
                 ),
-                "file_size": os.path.getsize(OUTPUT_CSV_PATH) / 1024,  # KB
+                "file_size": os.path.getsize(OUTPUT_CSV_PATH) / 1024,
             }
             print(f"userdata{user_detail}")
-            # 渲染分析结果页面
             return render_template(
                 "bilibili/uid_analysis_result.html",
                 name=name,
@@ -330,7 +324,6 @@ def analyze_file(name):
                 static_path=STATIC_IMAGE_DIR,
                 user_detail=user_detail,
             )
-
     except Exception as e:
         flash(f"分析失败: {str(e)}", "danger")
         return redirect(url_for("bilibili.upload_file", name=name))

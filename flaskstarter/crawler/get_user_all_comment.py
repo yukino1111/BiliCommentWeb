@@ -13,7 +13,7 @@ class BilibiliUserCommentsCrawler:
         self.base_url = "https://api.aicu.cc/api/v3/search/getreply"
         self.comment_repo = CommentRepository(db_name)
         self.crawled_comment_count = 0
-        self.page_size = 500  # 每页评论数量
+        self.page_size = 500
 
     def _get_comments_page_from_api(
         self, uid: str, pn: int
@@ -22,15 +22,15 @@ class BilibiliUserCommentsCrawler:
             "uid": uid,
             "pn": pn,
             "ps": self.page_size,
-            "mode": 0,  # 0表示按时间排序，1表示按点赞排序
-            "keyword": "",  # 留空表示所有评论
+            "mode": 0,
+            "keyword": "",
         }
         try:
             response = requests.get(self.base_url, params=params, timeout=15)
-            response.raise_for_status()  # 检查HTTP响应状态码
+            response.raise_for_status() 
             data = response.json()
 
-            if data.get("code") != 0:  # 检查API返回的业务状态码
+            if data.get("code") != 0:
                 print(
                     f"API返回错误 for uid {uid}, page {pn}: {data.get('message', '未知错误')}"
                 )
@@ -57,10 +57,9 @@ class BilibiliUserCommentsCrawler:
             parentid = int(parent_data.get("parentid", 0)) if parent_data else 0
             rootid = int(parent_data.get("rootid", 0)) if parent_data else 0
 
-            # dyn 字段包含 oid 和 type
             dyn_data = raw_comment_data.get("dyn", {})
-            oid = int(dyn_data.get("oid", 0))  # 视频或内容的ID
-            type= int(dyn_data.get("type", 0))  # 评论类型
+            oid = int(dyn_data.get("oid", 0))
+            type= int(dyn_data.get("type", 0))
 
             comment_obj = Comment(
                 rpid=rpid,
@@ -72,10 +71,9 @@ class BilibiliUserCommentsCrawler:
                 oid=oid,
                 type=type,
             )
-            self.comment_repo.add_mini_comment(comment_obj, overwrite=True)  # 允许覆盖
+            self.comment_repo.add_mini_comment(comment_obj, overwrite=True)
 
             self.crawled_comment_count += 1
-            # print(f"  - 存储评论: rpid={rpid}, oid={oid}")
         except Exception as e:
             print(f"处理或存储评论数据失败 (rpid: {raw_comment_data.get('rpid')}): {e}")
 
@@ -98,17 +96,17 @@ class BilibiliUserCommentsCrawler:
 
             replies = data.get("replies", [])
             if not replies:
-                is_end = True  # 即使 is_end 为 false，如果 replies 为空也视为结束
+                is_end = True
                 break
 
             for reply in replies:
                 self._parse_and_save_comment(reply, uid)
 
             cursor_info = data.get("cursor", {})
-            is_end = cursor_info.get("is_end", True)  # 默认如果is_end缺失则视为结束
+            is_end = cursor_info.get("is_end", True)
 
             if not is_end:
-                time.sleep(delay_seconds)  # 延迟，避免请求过快
+                time.sleep(delay_seconds)
                 current_page += 1
             else:
                 print(f"用户 {uid} 的评论已全部爬取。")

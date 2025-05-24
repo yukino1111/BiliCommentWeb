@@ -17,10 +17,10 @@ class BilibiliUserCrawler:
         url = f"{self.base_url}?mid={mid}"
         try:
             response = requests.get(url, timeout=10)
-            response.raise_for_status()  # 检查HTTP响应状态码
+            response.raise_for_status()
             data = response.json()
 
-            if data.get("code") != 0:  # 检查API返回的业务状态码
+            if data.get("code") != 0:
                 print(f"API返回错误 for mid {mid}: {data.get('message', '未知错误')}")
                 return None
 
@@ -41,7 +41,7 @@ class BilibiliUserCrawler:
             return None
 
         card_data = raw_data.get("card", {})
-        like_num = raw_data.get("like_num")  # 获赞数在card同级
+        like_num = raw_data.get("like_num")
 
         if not card_data:
             print(f"Warning: No 'card' data found for mid {mid}.")
@@ -49,14 +49,14 @@ class BilibiliUserCrawler:
 
         try:
             user_obj = User(
-                mid=int(card_data.get("mid")),  # 确保mid是int类型
+                mid=int(card_data.get("mid")),
                 face=card_data.get("face"),
                 fans=card_data.get("fans"),
                 friend=card_data.get("friend"),
                 name=card_data.get("name"),
                 sex=card_data.get("sex"),
                 sign=card_data.get("sign"),
-                like_num=like_num,  # 获赞数
+                like_num=like_num,
                 vip=1 if card_data.get("vip", {}).get("vipStatus") == 1 else 0,
             )
             print(f"成功获得用户信息: {user_obj.name} (mid: {user_obj.mid})")
@@ -80,10 +80,10 @@ class BilibiliUserCrawler:
             if user:
                 successful_crawls += 1
 
-            if i < len(mids) - 1:  # 不是最后一个请求才延迟
+            if i < len(mids) - 1:
                 time.sleep(delay_seconds)
 
-            if (i + 1) % 10 == 0:  # 每爬取10个用户打印一次进度
+            if (i + 1) % 10 == 0:
                 print(f"已处理 {i + 1}/{len(mids)} 个用户。成功: {successful_crawls}")
 
         print(f"批量爬取完成。总计成功爬取 {successful_crawls} 个用户。")

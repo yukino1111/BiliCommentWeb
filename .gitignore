@@ -17,6 +17,7 @@ ENV/
 bili_cookie.txt
 bili_cookie1.txt
 bili_data.db
+db.sqlite
 *.csv
 ./flaskstarter/assets/chrome_user_data/
 /flaskstarter/static/images

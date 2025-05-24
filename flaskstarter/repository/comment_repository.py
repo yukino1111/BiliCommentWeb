@@ -1,5 +1,5 @@
 import sqlite3
-from typing import List, Optional, Tuple, Iterator  # 导入类型提示
+from typing import List, Optional, Tuple, Iterator
 from ..entity.comment import Comment
 
 
@@ -14,13 +14,11 @@ class CommentRepository:
         conn = self._get_connection()
         cursor = conn.cursor()
         try:
-            # 检查 rpid 是否已存在
             cursor.execute("SELECT 1 FROM comment WHERE rpid = ?", (comment.rpid,))
             exists = cursor.fetchone()
 
             if exists:
                 if overwrite:
-                    # 如果存在且允许覆盖，则执行 UPDATE
                     update_sql = """
                     UPDATE comment SET
                         parentid = ?, rootid = ?, mid = ?, name = ?, level = ?, sex = ?,
@@ -29,7 +27,6 @@ class CommentRepository:
                         vip = ?, face = ?, oid = ?, type = ?
                     WHERE rpid = ?
                     """
-                    # 更新操作，rpid 在 WHERE 子句，所以元组参数顺序要调整
                     params = (
                         comment.parentid,
                         comment.rootid,
@@ -53,10 +50,8 @@ class CommentRepository:
                     conn.commit()
                     return True
                 else:
-                    # 如果存在且不允许覆盖，则不操作
                     return False
             else:
-                # 如果不存在，则执行 INSERT
                 insert_sql = """
                 INSERT INTO comment (
                     rpid, parentid, rootid, mid, name, level, sex, information,
@@ -78,19 +73,16 @@ class CommentRepository:
         conn = self._get_connection()
         cursor = conn.cursor()
         try:
-            # 检查 rpid 是否已存在
             cursor.execute("SELECT 1 FROM comment WHERE rpid = ?", (comment.rpid,))
             exists = cursor.fetchone()
 
             if exists:
                 if overwrite:
-                    # 如果存在且允许覆盖，则执行 UPDATE
                     update_sql = """
                     UPDATE comment SET
                         parentid = ?, rootid=?, mid = ?,information = ?, time = ?, oid = ?, type = ?
                     WHERE rpid = ?
                     """
-                    # 更新操作，rpid 在 WHERE 子句，所以元组参数顺序要调整
                     params = (
                         comment.parentid,
                         comment.rootid,
@@ -105,10 +97,8 @@ class CommentRepository:
                     conn.commit()
                     return True
                 else:
-                    # 如果存在且不允许覆盖，则不操作
                     return False
             else:
-                # 如果不存在，则执行 INSERT
                 insert_sql = """
                 INSERT INTO comment (
                     rpid, parentid, rootid, mid, information, time, oid, type
@@ -145,7 +135,6 @@ class CommentRepository:
         conn = self._get_connection()
         cursor = conn.cursor()
         try:
-            # 使用 IN 子句处理多个 mid
             placeholders = ",".join(["?"] * len(mids))
             delete_sql = f"DELETE FROM comment WHERE mid IN ({placeholders})"
             cursor.execute(delete_sql, tuple(mids))
@@ -169,7 +158,6 @@ class CommentRepository:
         conn = self._get_connection()
         cursor = conn.cursor()
         try:
-            # 使用 IN 子句处理多个 oid
             placeholders = ",".join(["?"] * len(oids))
             delete_sql = f"DELETE FROM comment WHERE oid IN ({placeholders})"
             cursor.execute(delete_sql, tuple(oids))
@@ -195,7 +183,7 @@ class CommentRepository:
         if page < 1:
             page = 1
         if page_size < 1:
-            page_size = 20  # 默认值，防止传入无效值
+            page_size = 20
 
         offset = (page - 1) * page_size
         conn = self._get_connection()
@@ -255,7 +243,7 @@ class CommentRepository:
 
     def get_comments_by_mid_stream(self, mids: List[int]) -> Iterator[Comment]:
         if not mids:
-            return  # 使用 return 结束生成器
+            return
 
         conn = self._get_connection()
         try:
@@ -268,7 +256,7 @@ class CommentRepository:
             """
             cursor.execute(query_sql, tuple(mids))
             while True:
-                rows = cursor.fetchmany(1000)  # 每次取1000条，避免一次性加载过多内存
+                rows = cursor.fetchmany(1000)
                 if not rows:
                     break
                 for row in rows:
@@ -285,7 +273,7 @@ class CommentRepository:
         返回一个 Comment 对象的迭代器。
         """
         if not oids:
-            return  # 使用 return 结束生成器
+            return
 
         conn = self._get_connection()
         try:
@@ -299,7 +287,7 @@ class CommentRepository:
             """
             cursor.execute(query_sql, tuple(oids))
             while True:
-                rows = cursor.fetchmany(1000)  # 每次取1000条
+                rows = cursor.fetchmany(1000)
                 if not rows:
                     break
                 for row in rows:

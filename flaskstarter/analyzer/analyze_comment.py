@@ -17,7 +17,6 @@ import matplotlib.dates as mdates
 import collections
 import numpy as np
 
-# 确保这些是从你的config导入
 from ..tools.config import *
 
 SQUARE = 1600
@@ -34,10 +33,10 @@ class CommentAnalyzer:
         self.font_path = FONT_PATH
         self.stopwords_path = HIT_STOPWORDS_PATH
         self.output_dir = IMAGE_DIR
-        self.df = None  # 存储原始评论数据
-        self.df_unique_users = None  # 存储按用户ID去重后的数据
-        self._setup_matplotlib_font()  # 设置matplotlib字体
-        self._create_output_directory()  # 创建输出目录
+        self.df = None
+        self.df_unique_users = None 
+        self._setup_matplotlib_font()
+        self._create_output_directory()
 
     def _setup_matplotlib_font(self):
         """设置matplotlib支持中文显示和使用指定字体。"""
@@ -50,7 +49,7 @@ class CommentAnalyzer:
             print(
                 f"警告: 设置matplotlib字体失败，请检查字体文件路径 '{self.font_path}' 是否正确或文件是否有效。错误信息: {e}"
             )
-            plt.rcParams["font.sans-serif"] = ["SimHei", "Arial Unicode MS"]  # Fallback
+            plt.rcParams["font.sans-serif"] = ["SimHei", "Arial Unicode MS"]
             plt.rcParams["axes.unicode_minus"] = False
             print("回退到默认中文字体。")
 
@@ -69,7 +68,6 @@ class CommentAnalyzer:
             self.df["评论ID"] = self.df["评论ID"].astype(str)
             self.df["评论时间"] = pd.to_datetime(self.df["评论时间"])
 
-            # 针对用户维度的分析，根据用户ID去重，保留每个用户的第一次出现记录
             self.df_unique_users = self.df.drop_duplicates(subset=["用户ID"]).copy()
             print(f"原始评论数量: {len(self.df)}")
             print(f"去重用户数量: {len(self.df_unique_users)}")
@@ -230,7 +228,6 @@ class CommentAnalyzer:
                 **plot_kwargs,
             )
 
-    # (其他分析方法保持不变)
     def analyze_ip_distribution(self):
         """分析用户IP属地分布并生成柱状图（基于去重用户）。"""
         if self.df_unique_users is None:
@@ -437,7 +434,6 @@ class CommentAnalyzer:
         else:
             print("没有足够的有效情感分析结果来生成分布图。")
         average_sentiment_score = self.df["sentiment_score"].dropna().mean()
-        # print(f"评论的平均情感分数 (0-1, 1为最积极): {average_sentiment_score:.4f}")
 
     def generate_wordcloud(self):
         if self.df is None:
@@ -502,9 +498,8 @@ class CommentAnalyzer:
 
         num_vars = len(categories)
         angles = np.linspace(0, 2 * np.pi, num_vars, endpoint=False).tolist()
-        angles = angles + angles[:1]  # 闭合雷达图
+        angles = angles + angles[:1]
 
-        # 绘制红线（赞数Top5评论的平均值）
         ax.plot(
             angles,
             values_top5_avg + values_top5_avg[:1],
@@ -515,7 +510,6 @@ class CommentAnalyzer:
         )
         ax.fill(angles, values_top5_avg + values_top5_avg[:1], color="red", alpha=0.25)
 
-        # 绘制蓝线（所有评论的平均值）
         ax.plot(
             angles,
             values_avg + values_avg[:1],
@@ -526,10 +520,9 @@ class CommentAnalyzer:
         )
         ax.fill(angles, values_avg + values_avg[:1], color="blue", alpha=0.25)
 
-        ax.set_theta_offset(np.pi / 2)  # 设置0度在顶部
-        ax.set_theta_direction(-1)  # 顺时针方向
+        ax.set_theta_offset(np.pi / 2)
+        ax.set_theta_direction(-1)
 
-        # 设置径向轴标签
         ax.set_xticks(angles[:-1])
         ax.set_xticklabels(
             categories,
@@ -537,11 +530,9 @@ class CommentAnalyzer:
             fontsize=12,
         )
 
-        # 不显示径向刻度
         ax.set_yticks([])
         ax.set_yticklabels([])
 
-        # 设置径向轴的范围，确保所有数据点都在0到1之间，并且图表能显示完整的圆
         ax.set_ylim(0, 1)
 
         ax.legend(
@@ -565,7 +556,7 @@ class CommentAnalyzer:
         """
         display_figsize = (x / dpi, y / dpi)
         display_fig = plt.figure(figsize=display_figsize, dpi=dpi)
-        display_ax = display_fig.add_subplot(111, polar=True)  # 极坐标投影
+        display_ax = display_fig.add_subplot(111, polar=True) 
 
         self._render_radar_plot_on_ax(
             display_ax, plot_data, show_title, show_title_size, is_display=True
@@ -583,13 +574,13 @@ class CommentAnalyzer:
         """
         save_figsize = (x / dpi, y / dpi)
         save_fig = plt.figure(figsize=save_figsize, dpi=dpi)
-        save_ax = save_fig.add_subplot(111, polar=True)  # 极坐标投影
+        save_ax = save_fig.add_subplot(111, polar=True)
 
         self._render_radar_plot_on_ax(
             save_ax, plot_data, is_display=False
-        )  # 不显示标题
+        )
 
-        save_fig.subplots_adjust(bottom=0, top=1, left=0, right=1)  # 紧密布局
+        save_fig.subplots_adjust(bottom=0, top=1, left=0, right=1)
 
         if not save_filename.lower().endswith(f".{save_format}"):
             save_filename_with_ext = (
@@ -604,7 +595,7 @@ class CommentAnalyzer:
             getSavePath,
             bbox_inches="tight",
             format=save_format,
-            transparent=True,  # 严格要求透明背景
+            transparent=True,
             dpi=dpi,
         )
         print(f"图片已保存到: {getSavePath} (格式: {save_format}, 透明背景: True)")
@@ -620,24 +611,17 @@ class CommentAnalyzer:
             print("评论数据为空，无法生成雷达图。")
             return
 
-        # 1. 计算所有评论的平均特征
         avg_level = self.df["用户等级"].mean()
         avg_reply_num = self.df["回复数"].mean()
         avg_like_num = self.df["点赞数"].mean()
         avg_vip = (self.df["是否是大会员"] == "是").astype(int).mean()
 
-        # print(f"所有评论的平均特征:")
-        # print(f"  等级: {avg_level:.2f}, 回复数: {avg_reply_num:.2f}, 点赞数: {avg_like_num:.2f}, 大会员: {avg_vip:.2f}")
-
-        # 2. 找出点赞数Top5的评论，并计算其平均特征
         if self.df.empty:
             print("评论数据为空，无法计算Top5评论。")
             return
 
-        # 确保点赞数是数值类型，并处理NaN值
         df_sorted_by_like = self.df.sort_values(by="点赞数", ascending=False).copy()
 
-        # 确保至少有5条评论，否则取所有评论
         top5_comments = df_sorted_by_like.head(5)
 
         if top5_comments.empty:
@@ -649,18 +633,11 @@ class CommentAnalyzer:
         top5_avg_like_num = top5_comments["点赞数"].mean()
         top5_avg_vip = (top5_comments["是否是大会员"] == "是").astype(int).mean()
 
-        # print(f"\n赞数Top5评论的平均特征:")
-        # print(f"  等级: {top5_avg_level:.2f}, 回复数: {top5_avg_reply_num:.2f}, 点赞数: {top5_avg_like_num:.2f}, 大会员: {top5_avg_vip:.2f}")
-
-        # 3. 数据归一化
         categories = ["用户等级", "回复数", "点赞数", "是否是大会员"]
 
-        # 定义每个维度的最大值，用于归一化
         max_level = 6
         max_vip = 1
 
-        # 回复数和点赞数：取两组数据中该维度上的最大值作为归一化范围
-        # 确保至少为1，避免除以0
         max_reply_num_for_norm = max(avg_reply_num, top5_avg_reply_num)
         if max_reply_num_for_norm == 0:
             max_reply_num_for_norm = 1
@@ -668,14 +645,7 @@ class CommentAnalyzer:
         max_like_num_for_norm = max(avg_like_num, top5_avg_like_num)
         if max_like_num_for_norm == 0:
             max_like_num_for_norm = 1
-
-        # print("\n--- 各维度归一化范围 ---")
-        # print(f"用户等级归一化最大值: {max_level}")
-        # print(f"回复数归一化最大值 (取两组中最大): {max_reply_num_for_norm}")
-        # print(f"点赞数归一化最大值 (取两组中最大): {max_like_num_for_norm}")
-        # print(f"大会员归一化最大值: {max_vip}")
-
-        # 归一化赞数Top5评论的平均值
+            
         normalized_top5_avg_values = [
             top5_avg_level / max_level,
             top5_avg_reply_num / max_reply_num_for_norm,
@@ -683,7 +653,6 @@ class CommentAnalyzer:
             top5_avg_vip / max_vip,
         ]
 
-        # 归一化所有评论的平均值
         normalized_avg_values = [
             avg_level / max_level,
             avg_reply_num / max_reply_num_for_norm,
@@ -691,7 +660,6 @@ class CommentAnalyzer:
             avg_vip / max_vip,
         ]
 
-        # 确保归一化后的值在0-1之间，防止浮点数误差导致超出
         normalized_top5_avg_values = [
             min(1.0, max(0.0, v)) for v in normalized_top5_avg_values
         ]
@@ -701,14 +669,12 @@ class CommentAnalyzer:
         # print(f"赞数Top5评论平均归一化值: {normalized_top5_avg_values}")
         # print(f"所有评论平均归一化值: {normalized_avg_values}")
 
-        # 4. 绘制雷达图
         plot_data = {
             "categories": categories,
             "values_top5_avg": normalized_top5_avg_values,
             "values_avg": normalized_avg_values,
         }
 
-        # 调用独立的保存函数
         self._save_radar_plot(
             plot_data=plot_data,
             save_filename="comment_radar_chart.png",
@@ -718,7 +684,6 @@ class CommentAnalyzer:
             save_format="png",
         )
 
-        # 调用独立的显示函数
         if show_plot:
             self._display_radar_plot(
                 plot_data=plot_data,

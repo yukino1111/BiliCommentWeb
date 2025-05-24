@@ -19,8 +19,6 @@ class UserRepository:
         conn = self._get_connection()
         cursor = conn.cursor()
         try:
-            # 使用 INSERT OR REPLACE 语句，SQLite 特有且高效的 UPSERT 方式
-            # 它会尝试插入新行，如果主键冲突，则替换掉现有行
             insert_or_replace_sql = """
             INSERT OR REPLACE INTO user (
                 mid, face, fans, friend, name, sex, sign, like_num, vip
