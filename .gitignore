@@ -21,3 +21,7 @@ db.sqlite
 *.csv
 ./flaskstarter/assets/chrome_user_data/
 /flaskstarter/static/images
+uid_analysis_result.png
+uid_upload_success.png
+dashboard.png
+select_mode.png

@@ -299,7 +299,6 @@ def analyze_file(name):
                     user_detail["comment_info"]["face"], stream=True
                 )
                 response.raise_for_status()
-                print(USER_FACE_PATH)
                 with open(USER_FACE_PATH, "wb") as file:
                     for chunk in response.iter_content(chunk_size=8192):
                         file.write(chunk)
@@ -315,7 +314,6 @@ def analyze_file(name):
                 ),
                 "file_size": os.path.getsize(OUTPUT_CSV_PATH) / 1024,
             }
-            print(f"userdata{user_detail}")
             return render_template(
                 "bilibili/uid_analysis_result.html",
                 name=name,

@@ -1,9 +1,388 @@
-{% from "macros/_form.html" import render_form %}
+{% from "macros/_form.html" import render_form %} {% set page_title =
+'首页' %} {% extends 'layouts/base.html' %} {% block body %}
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ page_title }}</title>
+  <!-- 引用 Bootstrap CSS -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <!-- 引用 Bootstrap Icons -->
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+  />
+</head>
+<style>
+  body {
+    background-color: #f8f9fa; /* 浅灰色背景 */
+    font-family: "Arial", sans-serif;
+  }
 
-{% set page_title = 'Dashboard' %}
+  .dashboard-header {
+    background: linear-gradient(135deg, #007bff, #6610f2); /* 渐变背景 */
+    color: white;
+    padding: 60px 0;
+    text-align: center;
+    border-bottom-left-radius: 50px; /* 左下角圆弧 */
+    border-bottom-right-radius: 50px; /* 右下角圆弧 */
+    margin-bottom: 40px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  }
 
-{% extends 'layouts/base.html' %}
+  .dashboard-header h1 {
+    font-size: 3.5em;
+    font-weight: bold;
+    margin-bottom: 15px;
+    letter-spacing: 1px;
+  }
 
-{% block body %}
+  .dashboard-header p {
+    font-size: 1.2em;
+    opacity: 0.9;
+    max-width: 700px;
+    margin: 0 auto;
+  }
 
+  .feature-card {
+    background-color: #fff;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    height: 100%; /* 确保卡片高度一致 */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .feature-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  }
+
+  .feature-card .icon {
+    font-size: 3.5em;
+    color: #007bff; /* 主题色 */
+    margin-bottom: 20px;
+  }
+
+  .feature-card h3 {
+    font-size: 1.8em;
+    color: #343a40;
+    margin-bottom: 15px;
+  }
+
+  .feature-card p {
+    color: #6c757d;
+    font-size: 1em;
+    flex-grow: 1; /* 让描述占据更多空间 */
+  }
+
+  .stats-section {
+    background-color: #e9ecef;
+    padding: 40px 0;
+    margin-bottom: 40px;
+    border-radius: 15px;
+    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+
+  .stat-item {
+    text-align: center;
+    padding: 15px;
+  }
+
+  .stat-value {
+    font-size: 2.5em;
+    font-weight: bold;
+    color: #007bff;
+    margin-bottom: 5px;
+  }
+
+  .stat-label {
+    font-size: 1.1em;
+    color: #495057;
+  }
+
+  .highlight-features {
+    margin-bottom: 40px;
+  }
+
+  .highlight-features h2 {
+    text-align: center;
+    color: #343a40;
+    margin-bottom: 30px;
+    font-size: 2.5em;
+    position: relative;
+  }
+
+  .highlight-features h2::after {
+    content: "";
+    display: block;
+    width: 80px;
+    height: 4px;
+    background-color: #007bff;
+    margin: 10px auto 0;
+    border-radius: 2px;
+  }
+
+  .feature-list-item {
+    background-color: #f0f8ff; /* 浅蓝色背景 */
+    border-left: 5px solid #007bff;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+
+  .feature-list-item i {
+    font-size: 2em;
+    color: #007bff;
+    flex-shrink: 0;
+  }
+
+  .feature-list-item h4 {
+    font-size: 1.3em;
+    color: #343a40;
+    margin-bottom: 5px;
+  }
+
+  .feature-list-item p {
+    font-size: 0.95em;
+    color: #6c757d;
+    margin-bottom: 0;
+  }
+
+  .action-buttons {
+    text-align: center;
+    margin-top: 50px;
+    margin-bottom: 50px;
+  }
+
+  .action-buttons .btn {
+    padding: 15px 30px;
+    font-size: 1.2em;
+    border-radius: 30px;
+    margin: 0 15px;
+    transition: all 0.3s ease;
+  }
+
+  .action-buttons .btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+  }
+
+  .action-buttons .btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+    transform: translateY(-3px);
+  }
+
+  .action-buttons .btn-outline-secondary {
+    color: #6c757d;
+    border-color: #6c757d;
+  }
+
+  .action-buttons .btn-outline-secondary:hover {
+    background-color: #6c757d;
+    color: white;
+    transform: translateY(-3px);
+  }
+  .disclaimer-section {
+    background-color: #f0f0f0; /* 浅灰色背景 */
+    padding: 30px 0;
+    margin-top: 50px; /* 与上方内容的间距 */
+    border-top: 1px solid #e0e0e0;
+    color: #6c757d;
+    font-size: 0.9em;
+  }
+  .disclaimer-section h4 {
+    color: #495057;
+    margin-bottom: 15px;
+    font-weight: bold;
+    text-align: center;
+  }
+  .disclaimer-section p {
+    max-width: 800px;
+    margin: 0 auto 10px auto;
+    line-height: 1.8;
+    text-align: left;
+  }
+  .disclaimer-section a {
+    color: #007bff;
+    text-decoration: none;
+  }
+  .disclaimer-section a:hover {
+    text-decoration: underline;
+  }
+  /* 响应式调整 */
+  @media (max-width: 768px) {
+    .dashboard-header h1 {
+      font-size: 2.5em;
+    }
+    .dashboard-header p {
+      font-size: 1em;
+    }
+    .feature-card {
+      margin-bottom: 20px;
+    }
+    .stat-value {
+      font-size: 2em;
+    }
+    .stat-label {
+      font-size: 1em;
+    }
+    .highlight-features h2 {
+      font-size: 2em;
+    }
+    .action-buttons .btn {
+      display: block;
+      width: 80%;
+      margin: 15px auto;
+    }
+  }
+</style>
+
+<div class="dashboard-header">
+  <div class="container">
+    <i
+      class="bi bi-bar-chart-line-fill"
+      style="font-size: 5em; margin-bottom: 20px"
+    ></i>
+    <h1>B站评论智能分析平台</h1>
+    <p>深入挖掘Bilibili评论数据，洞察用户情感、行为模式与内容热点。</p>
+  </div>
+</div>
+
+<div class="container">
+  <!-- 核心功能区 -->
+  <section class="my-5">
+    <h2 class="text-center mb-5" style="color: #343a40; font-weight: bold">
+      核心功能
+    </h2>
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+      <div class="col">
+        <div class="feature-card">
+          <div class="icon"><i class="bi bi-play-btn-fill"></i></div>
+          <h3>视频评论分析</h3>
+          <p>输入B站视频链接，获取所有评论数据，并进行多维度分析。</p>
+          <a
+            href="{{ url_for('bilibili.bv_crawler') }}"
+            class="btn btn-outline-primary mt-3"
+            >开始分析</a
+          >
+        </div>
+      </div>
+      <div class="col">
+        <div class="feature-card">
+          <div class="icon"><i class="bi bi-person-circle"></i></div>
+          <h3>UP主视频评论分析</h3>
+          <p>输入UP主UID，分析其视频的所有评论，了解其观众偏好。</p>
+          <a
+            href="{{ url_for('bilibili.up_crawler') }}"
+            class="btn btn-outline-primary mt-3"
+            >开始分析</a
+          >
+        </div>
+      </div>
+      <div class="col">
+        <div class="feature-card">
+          <div class="icon"><i class="bi-chat-left-text-fill"></i></div>
+          <h3>用户评论分析</h3>
+          <p>输入用户UID，分析其在B站的所有评论历史，了解其偏好。</p>
+          <a
+            href="{{ url_for('bilibili.uid_crawler') }}"
+            class="btn btn-outline-primary mt-3"
+            >开始分析</a
+          >
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 亮点功能列表 -->
+  <section class="highlight-features">
+    <h2>我们的特色分析</h2>
+    <div class="row">
+      <div class="col-md-6">
+        <div class="feature-list-item">
+          <i class="bi bi-emoji-smile"></i>
+          <div>
+            <h4>情感倾向分析</h4>
+            <p>精准识别评论中的积极、消极、中性情感，洞察用户情绪。</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="feature-list-item">
+          <i class="bi bi-cloud-fill"></i>
+          <div>
+            <h4>高频词云生成</h4>
+            <p>直观展示评论中最常出现的关键词，快速把握核心内容。</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="feature-list-item">
+          <i class="bi bi-graph-up"></i>
+          <div>
+            <h4>评论时间趋势</h4>
+            <p>分析评论发布的时间分布，发现评论高峰期和互动规律。</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="feature-list-item">
+          <i class="bi bi-bar-chart-fill"></i>
+          <div>
+            <h4>多维度数据可视化</h4>
+            <p>通过丰富的图表，清晰呈现评论数据的各项统计结果。</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="feature-list-item">
+          <i class="bi bi-file-earmark-arrow-down-fill"></i>
+          <div>
+            <h4>数据导出与报告</h4>
+            <p>支持原始评论数据和分析报告导出，方便进一步研究。</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="feature-list-item">
+          <i class="bi bi-shield-check-fill"></i>
+          <div>
+            <h4>数据安全与隐私</h4>
+            <p>严格遵守数据安全规范，保护您的数据隐私。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+<section class="disclaimer-section">
+  <div class="container">
+    <h4>免责声明</h4>
+    <p>
+      本平台提供的Bilibili评论分析服务，旨在为用户提供数据洞察和研究便利。
+      所有数据均来源于Bilibili公开接口，并仅供学习、研究和个人非商业用途。
+    </p>
+    <p>
+      我们不对所获取数据的完整性、准确性、及时性或合法性做任何形式的保证。
+      用户在使用本平台时，应严格遵守Bilibili平台的用户协议、社区规范以及所有适用的法律法规。
+    </p>
+    <p>
+      因使用本平台而产生的任何直接或间接的损失、损害或法律责任，本平台及其开发者概不承担。
+      用户需自行承担使用本平台的一切风险。
+    </p>
+    <p>本平台与Bilibili官方无任何关联。</p>
+  </div>
+</section>
 {% endblock %}

@@ -11,7 +11,7 @@
     href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
   />
 </head>
-<div class="container mt-5 pt-5">
+<div class="my-custom-wide-container mt-5 pt-5">
   <div class="row justify-content-center">
     {# 调整主内容区域的宽度，例如从 col-md-8 调整为 col-md-10 或 col-lg-9/10 #}
     <div class="col-md-10 col-lg-9">
@@ -307,7 +307,20 @@
     min-width: 120px; /* 链接按钮需要足够宽度 */
     width: 10%;
   }
-
+  .my-custom-wide-container {
+  width: 100%; /* 确保在小屏幕上能铺满 */
+  max-width: 1400px; /* 设置你想要的自定义最大宽度，例如 1400px */
+  margin-left: auto; /* 左右外边距自动，实现居中 */
+  margin-right: auto; /* 左右外边距自动，实现居中 */
+  /* 或者简写为 margin: 0 auto; 如果你不需要覆盖 mt-5 */
+  /* 注意：mt-5 和 pt-5 仍然会生效，因为它们是独立的类 */
+}
+/* 针对不同屏幕尺寸进行微调（可选，但推荐） */
+  @media (min-width: 1200px) { /* 针对 xl 屏幕 */
+  .my-custom-wide-container {
+    max-width: 1500px; /* 在更大的屏幕上可以更宽一点 */
+  }
+  }
   /* 针对小屏幕的响应式调整 */
   @media (max-width: 768px) {
     .comment-table th,
